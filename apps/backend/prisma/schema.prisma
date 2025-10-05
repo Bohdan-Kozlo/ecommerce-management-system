@@ -16,8 +16,12 @@ model User {
   lastName  String
   phone     String?
   address   String?
+  googleId  String? @unique
 
-  token String?
+  role Role @default(USER)
+
+  refreshToken          String?
+  refreshTokenExpiresAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
