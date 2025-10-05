@@ -15,10 +15,12 @@ export interface GoogleAuthRequest extends Request {
 }
 
 export interface JwtAuthRequest extends Request {
-  user: {
-    userId: string;
-    role: Role;
-  };
+  user: AuthUser;
+}
+
+export interface AuthUser {
+  userId: string;
+  role: Role;
 }
 
 export type PublicUser = Omit<User, 'password' | 'refreshToken' | 'refreshTokenExpiresAt'>;
