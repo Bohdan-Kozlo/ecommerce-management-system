@@ -54,4 +54,15 @@ export class UserService {
       data: { googleId },
     });
   }
+
+  async grantAdminRole(userId: string) {
+    return this.prisma.user.update({
+      where: { id: userId },
+      data: {
+        role: 'ADMIN',
+        refreshToken: null,
+        refreshTokenExpiresAt: null,
+      },
+    });
+  }
 }
