@@ -9,6 +9,7 @@ import { Role, User } from '@prisma/client';
 import type { Response } from 'express';
 import { PublicUser } from 'src/common/types/types';
 import { parseJwtExpirationToDate } from 'src/common/utils/date.utils';
+import { AuthProvider, EmailUserData, GoogleUserData, UserFactoryProvider } from './factories';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +18,7 @@ export class AuthService {
     private userService: UserService,
     private jwtService: JwtService,
     private configService: ConfigService,
+    private userFactoryProvider: UserFactoryProvider,
   ) {}
 
   async validateUser(email: string, password: string): Promise<PublicUser> {
@@ -36,16 +38,18 @@ export class AuthService {
   }
 
   async register(data: RegisterDto) {
-    const existingUser = await this.userService.findByEmail(data.email);
-    if (existingUser) {
-      throw new UnauthorizedException('Email already in use');
-    }
+    const factory = this.userFactoryProvider.getFactory(AuthProvider.EMAIL);
 
-    const hashedPassword = await bcrypt.hash(data.password, 10);
+    const emailData: EmailUserData = {
+      email: data.email,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      password: data.password,
+    };
 
-    const user = await this.userService.createUser(data, hashedPassword);
+    const result = await factory.createUserWithValidation(emailData);
 
-    return this.login(user);
+    return this.login(result.user);
   }
 
   async login(user: User | PublicUser): Promise<{
@@ -60,7 +64,7 @@ export class AuthService {
       ...safeUser
     } = user as User;
 
-    const tokens = await this.generateTokens(user.id, user.role as Role);
+    const tokens = await this.generateTokens(user.id, user.role);
     await this.storeRefreshToken(user.id, tokens.refreshToken);
 
     return {
@@ -75,19 +79,18 @@ export class AuthService {
     firstName: string;
     lastName: string;
   }) {
-    let user = await this.userService.findByGoogleId(profile.googleId);
+    const factory = this.userFactoryProvider.getFactory(AuthProvider.GOOGLE);
 
-    if (!user) {
-      user = await this.userService.findByEmail(profile.email);
-    }
+    const googleData: GoogleUserData = {
+      googleId: profile.googleId,
+      email: profile.email,
+      firstName: profile.firstName,
+      lastName: profile.lastName,
+    };
 
-    if (!user) {
-      user = await this.userService.createGoogleUser(profile);
-    } else if (!user.googleId) {
-      user = await this.userService.linkGoogleId(user.id, profile.googleId);
-    }
+    const result = await factory.createUserWithValidation(googleData);
 
-    return this.login(user);
+    return this.login(result.user);
   }
 
   async refreshTokens(userId: string, refreshToken: string) {
@@ -108,7 +111,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    const tokens = await this.generateTokens(user.id, user.role as Role);
+    const tokens = await this.generateTokens(user.id, user.role);
     await this.storeRefreshToken(user.id, tokens.refreshToken);
 
     const { password: _p, refreshToken: _rt, refreshTokenExpiresAt: _rte, ...safeUser } = user;
