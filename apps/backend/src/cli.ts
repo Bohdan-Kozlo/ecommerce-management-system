@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 import { NestFactory } from '@nestjs/core';
 import { Command } from 'commander';
-import { CliModule } from './modules/cli/cli.module';
-import { CliService } from './modules/cli/cli.service';
+import { CliModule } from './cli/cli.module';
+import { CliService } from './cli/cli.service';
 
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(CliModule, {
