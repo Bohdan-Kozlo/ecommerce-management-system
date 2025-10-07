@@ -23,6 +23,8 @@ model User {
   refreshToken          String?
   refreshTokenExpiresAt DateTime?
 
+  cart Cart?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -52,6 +54,7 @@ model Product {
   Category     Category?      @relation(fields: [categoryId], references: [id], onDelete: SetNull)
   categoryId   String?
   ProductImage ProductImage[]
+  CartItem     CartItem[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -66,4 +69,23 @@ model ProductImage {
   productId String
 
   @@map("product_images")
+}
+
+model Cart {
+  id     String @id @default(uuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  CartItem  CartItem[]
+}
+
+model CartItem {
+  id        String  @id @default(uuid())
+  cartId    String
+  cart      Cart    @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  quantity  Int     @default(1)
 }

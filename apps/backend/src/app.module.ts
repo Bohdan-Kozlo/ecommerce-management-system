@@ -5,6 +5,7 @@ import { UserModule } from './modules/user/user.module';
 import { ConfigModule } from '@nestjs/config';
 import { ProductModule } from './modules/product/product.module';
 import { CategoryModule } from './modules/category/category.module';
+import { CartModule } from './modules/cart/cart.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { CategoryModule } from './modules/category/category.module';
     ConfigModule.forRoot({ isGlobal: true }),
     ProductModule,
     CategoryModule,
+    CartModule,
   ],
 })
 export class AppModule {}
