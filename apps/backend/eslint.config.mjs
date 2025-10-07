@@ -38,6 +38,7 @@ export default tseslint.config(
           destructuredArrayIgnorePattern: '^_',
         },
       ],
+      '@typescript-eslint/no-unsafe-member-access': 'off',
     },
   },
 );
