@@ -57,6 +57,6 @@ export class CategoryService {
 
     await this.prisma.category.delete({ where: { id } });
 
-    return existingCategory.id;
+    return { categoryId: existingCategory.id };
   }
 }

@@ -11,7 +11,7 @@ export class CartService {
   async getUserCart(userId: string) {
     const cart = await this.prisma.cart.findUnique({
       where: { userId },
-      include: { CartItem: true },
+      include: { cartItems: true },
     });
 
     return cart;
@@ -21,7 +21,7 @@ export class CartService {
     const { productId, quantity } = dto;
 
     const cart = await this.findOrCreateCart(userId);
-    await this.addItemToExistingCart(cart, productId, quantity);
+    return await this.addItemToExistingCart(cart, productId, quantity);
   }
 
   async updateCartItemQuantity(userId: string, dto: UpdateCartItemQuantity) {
@@ -50,7 +50,7 @@ export class CartService {
   async cleanCart(userId: string) {
     const cart = await this.prisma.cart.findUnique({
       where: { userId },
-      include: { CartItem: true },
+      include: { cartItems: true },
     });
 
     if (!cart) {
@@ -61,19 +61,19 @@ export class CartService {
       where: { id: cart.id },
     });
 
-    return cart.id;
+    return { cartId: cart.id };
   }
 
   private async findOrCreateCart(userId: string) {
     let cart = await this.prisma.cart.findUnique({
       where: { userId },
-      include: { CartItem: true },
+      include: { cartItems: true },
     });
 
     if (!cart) {
       cart = await this.prisma.cart.create({
         data: { userId },
-        include: { CartItem: true },
+        include: { cartItems: true },
       });
     }
 
@@ -81,29 +81,29 @@ export class CartService {
   }
 
   private async addItemToExistingCart(
-    cart: Cart & { CartItem: CartItem[] },
+    cart: Cart & { cartItems: CartItem[] },
     productId: string,
     quantity: number,
   ) {
-    const existingCartItem = cart.CartItem.find((item) => item.productId === productId);
+    const existingCartItem = cart.cartItems.find((item) => item.productId === productId);
 
     if (existingCartItem) {
-      await this.updateExistingCartItem(existingCartItem, quantity);
+      return await this.updateExistingCartItem(existingCartItem, quantity);
     } else {
-      await this.createNewCartItem(cart.id, productId, quantity);
+      return await this.createNewCartItem(cart.id, productId, quantity);
     }
   }
 
   private async updateExistingCartItem(cartItem: CartItem, additionalQuantity: number) {
     const newQuantity = cartItem.quantity + additionalQuantity;
-    await this.prisma.cartItem.update({
+    return await this.prisma.cartItem.update({
       where: { id: cartItem.id },
       data: { quantity: newQuantity },
     });
   }
 
   private async createNewCartItem(cartId: string, productId: string, quantity: number) {
-    await this.prisma.cartItem.create({
+    return await this.prisma.cartItem.create({
       data: { cartId, productId, quantity },
     });
   }

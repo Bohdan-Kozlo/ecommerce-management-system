@@ -46,15 +46,15 @@ model Category {
 }
 
 model Product {
-  id           String         @id @default(uuid())
-  name         String
-  description  String?
-  price        Float
-  stock        Int            @default(0)
-  Category     Category?      @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  categoryId   String?
-  ProductImage ProductImage[]
-  CartItem     CartItem[]
+  id            String         @id @default(uuid())
+  name          String
+  description   String?
+  price         Float
+  stock         Int            @default(0)
+  Category      Category?      @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  categoryId    String?
+  productImages ProductImage[]
+  CartItem      CartItem[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -78,7 +78,7 @@ model Cart {
 
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
-  CartItem  CartItem[]
+  cartItems CartItem[]
 }
 
 model CartItem {

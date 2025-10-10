@@ -24,14 +24,14 @@ export class ProductService {
 
     return this.prisma.product.findUnique({
       where: { id: product.id },
-      include: { ProductImage: true, Category: true },
+      include: { productImages: true, Category: true },
     });
   }
 
   async findById(id: string) {
     const product = await this.prisma.product.findUnique({
       where: { id },
-      include: { ProductImage: true, Category: true },
+      include: { productImages: true, Category: true },
     });
 
     if (!product) {
@@ -81,7 +81,7 @@ export class ProductService {
         orderBy,
         skip,
         take: limit,
-        include: { ProductImage: true, Category: true },
+        include: { productImages: true, Category: true },
       }),
       this.prisma.product.count({ where }),
     ]);
@@ -118,7 +118,7 @@ export class ProductService {
 
     return this.prisma.product.findUnique({
       where: { id },
-      include: { ProductImage: true, Category: true },
+      include: { productImages: true, Category: true },
     });
   }
 
@@ -131,6 +131,7 @@ export class ProductService {
     await this.prisma.product.delete({
       where: { id },
     });
-    return deletedProduct.id;
+
+    return { productId: deletedProduct.id };
   }
 }
