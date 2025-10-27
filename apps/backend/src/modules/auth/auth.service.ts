@@ -9,7 +9,12 @@ import { Role, User } from '@prisma/client';
 import type { Response } from 'express';
 import { PublicUser } from 'src/common/types/types';
 import { parseJwtExpirationToDate } from 'src/common/utils/date.utils';
-import { AuthProvider, EmailUserData, GoogleUserData, UserFactoryProvider } from './factories';
+import {
+  AuthProvider,
+  EmailUserData,
+  GoogleUserData,
+  UserFactoryProvider,
+} from '../user/factories';
 
 @Injectable()
 export class AuthService {

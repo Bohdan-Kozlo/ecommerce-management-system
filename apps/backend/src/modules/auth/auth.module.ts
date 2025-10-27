@@ -8,16 +8,11 @@ import { JwtModule } from '@nestjs/jwt';
 import { AccessJwtStrategy } from './strategies/accessJwt.strategy';
 import { RefreshJwtStrategy } from './strategies/refreshJwt.strategy';
 import { GoogleStrategy } from './strategies/google.strategy';
-import { EmailUserFactory } from './factories/email-user.factory';
-import { GoogleUserFactory } from './factories/google-user.factory';
-import { UserFactoryProvider } from './factories/user-factory.provider';
-import { PrismaModule } from 'src/common/prisma/prisma.module';
 
 @Module({
   imports: [
     ConfigModule,
     UserModule,
-    PrismaModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -30,16 +25,6 @@ import { PrismaModule } from 'src/common/prisma/prisma.module';
     }),
   ],
   controllers: [AuthController],
-  providers: [
-    AuthService,
-    LocalStrategy,
-    AccessJwtStrategy,
-    RefreshJwtStrategy,
-    GoogleStrategy,
-    EmailUserFactory,
-    GoogleUserFactory,
-    UserFactoryProvider,
-  ],
-  exports: [AuthService],
+  providers: [AuthService, LocalStrategy, AccessJwtStrategy, RefreshJwtStrategy, GoogleStrategy],
 })
 export class AuthModule {}
