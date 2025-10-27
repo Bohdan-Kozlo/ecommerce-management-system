@@ -15,7 +15,6 @@ import { PaymentModule } from './modules/payment/payment.module';
     CommonModule,
     AuthModule,
     UserModule,
-    ConfigModule.forRoot({ isGlobal: true }),
     ProductModule,
     CategoryModule,
     CartModule,

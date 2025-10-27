@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
 import { IPaymentAdapter } from './adapters/payment-adapter';
 
 @Injectable()
 export class PaymentService {
-  constructor(private paymentAdapter: IPaymentAdapter) {}
+  constructor(@Inject(IPaymentAdapter) private paymentAdapter: IPaymentAdapter) {}
 }
