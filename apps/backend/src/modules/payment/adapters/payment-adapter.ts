@@ -1,5 +1,6 @@
 import { OrderItem, Product } from '@prisma/client';
 import { CreatePaymentDto } from '../dto/create-payment.dto';
+import type { PaymentDeliveryDetails } from '../events/payment-event.type';
 
 export interface IPaymentAdapter {
   createPayment(
@@ -29,6 +30,7 @@ export interface PaymentCallbackResult {
   orderId?: string;
   provider?: string;
   event?: string;
+  delivery?: PaymentDeliveryDetails;
 }
 
 export const IPaymentAdapter = Symbol('IPaymentAdapter');

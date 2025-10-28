@@ -1,4 +1,31 @@
-import { IsNotEmpty, IsNumber, IsOptional, IsString, IsUUID } from 'class-validator';
+import { Type } from 'class-transformer';
+import { DeliveryMethod } from '@prisma/client';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsNumber,
+  IsOptional,
+  IsString,
+  IsUUID,
+  ValidateNested,
+} from 'class-validator';
+
+export class DeliveryInfoDto {
+  @IsString()
+  @IsNotEmpty()
+  address!: string;
+
+  @IsEmail()
+  email!: string;
+
+  @IsOptional()
+  @IsString()
+  phone?: string;
+
+  @IsEnum(DeliveryMethod)
+  method!: DeliveryMethod;
+}
 
 export class CreatePaymentDto {
   @IsUUID()
@@ -24,4 +51,8 @@ export class CreatePaymentDto {
   @IsOptional()
   @IsString()
   cancelUrl?: string;
+
+  @ValidateNested()
+  @Type(() => DeliveryInfoDto)
+  delivery!: DeliveryInfoDto;
 }

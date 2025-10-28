@@ -105,13 +105,14 @@ model Order {
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
   orderItems OrderItem[]
+  delivery   Delivery?
 
   @@map("orders")
 }
 
 enum OrderStatus {
   PENDING
-  PROCESSING
+  PAID
   SHIPPED
   DELIVERED
   CANCELED
@@ -148,4 +149,20 @@ model Discount {
   isActive  Boolean  @default(true)
   productId String
   product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Delivery {
+  id      String         @id @default(uuid())
+  orderId String         @unique
+  order   Order          @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  address String
+  email   String
+  phone   String?
+  method  DeliveryMethod
+}
+
+enum DeliveryMethod {
+  COUIRIER
+  LOCKER
+  DEPARTMENT
 }

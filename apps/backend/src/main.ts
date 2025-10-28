@@ -4,7 +4,6 @@ import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import cookieParser from 'cookie-parser';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
-import { raw } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -25,8 +24,6 @@ async function bootstrap() {
       transform: true,
     }),
   );
-
-  app.use('/api/payments/webhook', raw({ type: 'application/json' }));
 
   app.useGlobalFilters(new AllExceptionsFilter());
 
