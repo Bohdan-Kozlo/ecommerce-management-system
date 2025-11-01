@@ -64,7 +64,7 @@ export default function Home() {
           <div className="flex w-full flex-wrap items-center justify-center gap-3 sm:w-auto">
             <Button asChild className="w-full sm:w-auto">
               <Link
-                href="/auth/sign-in"
+                href="/auth/login"
                 className="flex items-center justify-center gap-2"
               >
                 <LogIn className="h-4 w-4" />

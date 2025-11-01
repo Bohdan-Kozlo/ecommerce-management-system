@@ -1,0 +1,157 @@
+"use client";
+
+import { useActionState } from "react";
+import { useRouter } from "next/navigation";
+
+import { AuthDivider } from "@/components/auth/auth-divider";
+import { AuthShell } from "@/components/auth/auth-shell";
+import { GoogleButton } from "@/components/auth/google-button";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { getGoogleAuthUrl, register } from "@/services/auth/auth.service";
+import type { IAuthRegisterForm } from "@/shared/types/auth.interface";
+
+type FormState = {
+  status: "idle" | "success" | "error";
+  message?: string;
+};
+
+const initialState: FormState = {
+  status: "idle",
+};
+
+export default function Register() {
+  const router = useRouter();
+
+  const [state, formAction, pending] = useActionState<FormState, FormData>(
+    async (_prevState, formData) => {
+      const payload: IAuthRegisterForm = {
+        firstName: (formData.get("firstName") ?? "").toString().trim(),
+        lastName: (formData.get("lastName") ?? "").toString().trim(),
+        email: (formData.get("email") ?? "").toString().trim(),
+        password: (formData.get("password") ?? "").toString(),
+      };
+
+      if (Object.values(payload).some((value) => !value)) {
+        return {
+          status: "error",
+          message: "Please complete all required fields.",
+        } satisfies FormState;
+      }
+
+      try {
+        await register(payload);
+        router.push("/");
+        router.refresh();
+        return {
+          status: "success",
+          message: "Account created successfully.",
+        } satisfies FormState;
+      } catch (error) {
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Unable to create account. Please try again.";
+        return {
+          status: "error",
+          message,
+        } satisfies FormState;
+      }
+    },
+    initialState
+  );
+
+  return (
+    <AuthShell
+      title="Create an account"
+      description="Set up your store profile in a few quick steps."
+      footerText="Already have an account?"
+      footerLink={{ href: "/auth/login", label: "Sign in" }}
+    >
+      <form className="space-y-6" noValidate action={formAction}>
+        <div className="space-y-4">
+          <GoogleButton
+            label="Sign up with Google"
+            onClick={(event) => {
+              event.preventDefault();
+              window.location.href = getGoogleAuthUrl("/");
+            }}
+          />
+          <AuthDivider label="or sign up with email" />
+        </div>
+
+        <div className="space-y-4 text-left">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="firstName">First name</Label>
+              <Input
+                id="firstName"
+                name="firstName"
+                autoComplete="given-name"
+                placeholder="John"
+                required
+                disabled={pending}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="lastName">Last name</Label>
+              <Input
+                id="lastName"
+                name="lastName"
+                autoComplete="family-name"
+                placeholder="Doe"
+                required
+                disabled={pending}
+              />
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="email">Email address</Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              placeholder="you@example.com"
+              required
+              disabled={pending}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="password" hint="Minimum 8 characters">
+              Password
+            </Label>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              autoComplete="new-password"
+              placeholder="Create a password"
+              minLength={8}
+              required
+              disabled={pending}
+            />
+          </div>
+        </div>
+
+        {state.status !== "idle" ? (
+          <p
+            role="status"
+            className={
+              state.status === "error"
+                ? "text-sm text-destructive"
+                : "text-sm text-emerald-600"
+            }
+          >
+            {state.message}
+          </p>
+        ) : null}
+
+        <Button type="submit" className="w-full" disabled={pending}>
+          {pending ? "Creating..." : "Create account"}
+        </Button>
+      </form>
+    </AuthShell>
+  );
+}

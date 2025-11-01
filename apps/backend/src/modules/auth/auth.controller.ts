@@ -8,12 +8,14 @@ import type { AuthRequest, GoogleAuthRequest, JwtAuthRequest } from 'src/common/
 import { RegisterDto } from './dto/register.dto';
 import type { Response } from 'express';
 import { JwtTokenService } from './jwtToken.service';
+import { ConfigService } from '@nestjs/config';
 
 @Controller('auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
     private jwtTokenService: JwtTokenService,
+    private configService: ConfigService,
   ) {}
 
   @UseGuards(LocalGuard)
@@ -47,18 +49,15 @@ export class AuthController {
 
   @Get('google/callback')
   @UseGuards(GoogleGuard)
-  async googleAuthCallback(
-    @Request() req: GoogleAuthRequest,
-    @Res({ passthrough: true }) res: Response,
-  ) {
+  async googleAuthCallback(@Request() req: GoogleAuthRequest, @Res() res: Response) {
     const result = await this.authService.handleGoogleLogin(req.user);
 
     this.jwtTokenService.setRefreshTokenCookie(res, result.refreshToken);
     this.jwtTokenService.setAccessTokenCookie(res, result.accessToken);
 
-    return {
-      user: result.user,
-    };
+    const frontendUrl = this.configService.getOrThrow<string>('FRONTEND_URL');
+
+    return res.redirect(`${frontendUrl}/`);
   }
 
   @UseGuards(RefreshJwtGuard)
