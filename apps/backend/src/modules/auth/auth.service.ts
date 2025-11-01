@@ -3,10 +3,8 @@ import { PrismaService } from 'src/common/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { UserService } from '../user/user.service';
 import { RegisterDto } from './dto/register.dto';
-import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { Role, User } from '@prisma/client';
-import type { Response } from 'express';
+import { User } from '@prisma/client';
 import { PublicUser } from 'src/common/types/types';
 import { parseJwtExpirationToDate } from 'src/common/utils/date.utils';
 import {
@@ -15,13 +13,14 @@ import {
   GoogleUserData,
   UserFactoryProvider,
 } from '../user/factories';
+import { JwtTokenService } from './jwtToken.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private prisma: PrismaService,
     private userService: UserService,
-    private jwtService: JwtService,
+    private jwtTokenService: JwtTokenService,
     private configService: ConfigService,
     private userFactoryProvider: UserFactoryProvider,
   ) {}
@@ -69,7 +68,7 @@ export class AuthService {
       ...safeUser
     } = user as User;
 
-    const tokens = await this.generateTokens(user.id, user.role);
+    const tokens = await this.jwtTokenService.generateTokens(user.id, user.role);
     await this.storeRefreshToken(user.id, tokens.refreshToken);
 
     return {
@@ -116,8 +115,7 @@ export class AuthService {
       throw new UnauthorizedException('Invalid refresh token');
     }
 
-    const tokens = await this.generateTokens(user.id, user.role);
-    await this.storeRefreshToken(user.id, tokens.refreshToken);
+    const tokens = await this.jwtTokenService.generateTokens(user.id, user.role);
 
     const { password: _p, refreshToken: _rt, refreshTokenExpiresAt: _rte, ...safeUser } = user;
     return {
@@ -136,40 +134,6 @@ export class AuthService {
     });
 
     return { message: 'Logged out successfully' };
-  }
-
-  setRefreshTokenCookie(res: Response, refreshToken: string) {
-    res.cookie('refreshToken', refreshToken, {
-      httpOnly: true,
-      secure: this.configService.get('NODE_ENV') === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
-  }
-
-  clearRefreshTokenCookie(res: Response) {
-    res.clearCookie('refreshToken');
-  }
-
-  private async generateTokens(userId: string, role: Role) {
-    const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync(
-        { sub: userId, role },
-        {
-          expiresIn: this.configService.getOrThrow('JWT_ACCESS_EXPIRATION'),
-          secret: this.configService.getOrThrow('JWT_ACCESS_SECRET'),
-        },
-      ),
-      this.jwtService.signAsync(
-        { sub: userId, role },
-        {
-          expiresIn: this.configService.getOrThrow('JWT_REFRESH_EXPIRATION'),
-          secret: this.configService.getOrThrow('JWT_REFRESH_SECRET'),
-        },
-      ),
-    ]);
-
-    return { accessToken, refreshToken };
   }
 
   private async storeRefreshToken(userId: string, refreshToken: string) {

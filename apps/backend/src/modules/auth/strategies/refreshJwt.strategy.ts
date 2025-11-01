@@ -5,7 +5,7 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { JwtPayload } from 'src/common/types/types';
 import type { Request as ExpressRequest } from 'express';
 
-const createCookieExtractor = (cookieName: string) => {
+export const createCookieExtractor = (cookieName: string) => {
   return (req?: ExpressRequest): string | null => {
     if (!req) return null;
     const cookies = (req as unknown as { cookies?: Record<string, string> }).cookies;
