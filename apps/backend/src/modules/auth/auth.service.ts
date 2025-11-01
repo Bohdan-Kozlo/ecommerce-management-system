@@ -117,12 +117,11 @@ export class AuthService {
     }
 
     const tokens = await this.generateTokens(user.id, user.role);
-    await this.storeRefreshToken(user.id, tokens.refreshToken);
 
     const { password: _p, refreshToken: _rt, refreshTokenExpiresAt: _rte, ...safeUser } = user;
     return {
       user: safeUser as PublicUser,
-      ...tokens,
+      accessToken: tokens.accessToken,
     };
   }
 

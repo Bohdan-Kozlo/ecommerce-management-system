@@ -63,8 +63,6 @@ export class AuthController {
     const refreshToken = (req.cookies as Record<string, string> | undefined)?.refreshToken || '';
     const result = await this.authService.refreshTokens(req.user.userId, refreshToken);
 
-    this.authService.setRefreshTokenCookie(res, result.refreshToken);
-
     return {
       user: result.user,
       accessToken: result.accessToken,
