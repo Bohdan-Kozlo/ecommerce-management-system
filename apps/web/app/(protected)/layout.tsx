@@ -1,8 +1,5 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
-import { headers } from "next/headers";
-import { ProtectedHeader } from "@/components/layout/protected-header";
-import { getCurrentUserServer } from "@/services/user/user-server.service";
+import { Header } from "@/components/layout/header";
 
 export const metadata: Metadata = {
   title: "Profile | Ecommerce",
@@ -14,18 +11,9 @@ export default async function ProtectedLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  let user;
-  try {
-    user = await getCurrentUserServer();
-  } catch {
-    const headersList = await headers();
-    const pathname = headersList.get("x-pathname") || "/profile";
-    redirect(`/auth/login?from=${encodeURIComponent(pathname)}`);
-  }
-
   return (
     <>
-      <ProtectedHeader user={user} />
+      <Header />
       {children}
     </>
   );

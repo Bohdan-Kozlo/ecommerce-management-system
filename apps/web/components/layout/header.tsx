@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { LogOut, ShoppingCart, Package, User } from "lucide-react";
@@ -14,26 +15,55 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { IUser } from "@/shared/types/user.interface";
+import { getCurrentUser } from "@/services/user/user.service";
+import { apiFetch } from "@/api/api-fetch-client";
 import { API_URL } from "@/config/api.config";
 
-interface ProtectedHeaderProps {
-  user: IUser;
-}
-
-export function ProtectedHeader({ user }: ProtectedHeaderProps) {
+export function Header() {
   const router = useRouter();
+  const [user, setUser] = useState<IUser | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchUser() {
+      try {
+        const data = await getCurrentUser();
+        setUser(data);
+      } catch (error) {
+        console.error("Failed to fetch user:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchUser();
+  }, [router]);
 
   async function handleLogout() {
     try {
-      await fetch(API_URL.auth("logout"), {
+      await apiFetch(API_URL.auth("logout"), {
         method: "POST",
-        credentials: "include",
       });
       router.push("/auth/login");
       router.refresh();
     } catch {
       router.push("/auth/login");
     }
+  }
+
+  if (loading) {
+    return (
+      <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+        <div className="container flex h-14 items-center justify-between px-6">
+          <div className="h-5 w-32 bg-muted animate-pulse rounded" />
+          <div className="h-9 w-24 bg-muted animate-pulse rounded" />
+        </div>
+      </header>
+    );
+  }
+
+  if (!user) {
+    return null;
   }
 
   return (
