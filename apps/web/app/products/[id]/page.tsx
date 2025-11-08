@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { getProductById } from "@/services/product/product.service";
+import { addItemToCart } from "@/services/cart/cart.service";
 import type { IProduct } from "@/shared/types/product.interface";
 
 export default function ProductDetailPage({
@@ -21,20 +22,40 @@ export default function ProductDetailPage({
   const [product, setProduct] = useState<IProduct | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState(0);
+  const [addingToCart, setAddingToCart] = useState(false);
+  const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
+    async function fetchProduct() {
+      setLoading(true);
+      try {
+        const data = await getProductById(id);
+        setProduct(data);
+      } catch (error) {
+        console.error("Failed to fetch product:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
     fetchProduct();
   }, [id]);
 
-  async function fetchProduct() {
-    setLoading(true);
+  async function handleAddToCart() {
+    if (!product) return;
+
+    setAddingToCart(true);
     try {
-      const data = await getProductById(id);
-      setProduct(data);
+      await addItemToCart({
+        productId: product.id,
+        quantity,
+      });
+      router.push("/cart");
     } catch (error) {
-      console.error("Failed to fetch product:", error);
+      console.error("Failed to add to cart:", error);
+      alert("Failed to add item to cart. Please try again.");
     } finally {
-      setLoading(false);
+      setAddingToCart(false);
     }
   }
 
@@ -161,10 +182,52 @@ export default function ProductDetailPage({
             </Card>
           )}
 
-          <div className="flex gap-4">
-            <Button size="lg" className="flex-1" disabled={product.stock === 0}>
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <label className="font-medium">Quantity:</label>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  disabled={quantity <= 1}
+                >
+                  -
+                </Button>
+                <input
+                  type="number"
+                  min="1"
+                  max={product.stock}
+                  value={quantity}
+                  onChange={(e) => {
+                    const val = parseInt(e.target.value);
+                    if (!isNaN(val) && val > 0 && val <= product.stock) {
+                      setQuantity(val);
+                    }
+                  }}
+                  className="w-16 text-center border rounded px-2 py-1"
+                />
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() =>
+                    setQuantity(Math.min(product.stock, quantity + 1))
+                  }
+                  disabled={quantity >= product.stock}
+                >
+                  +
+                </Button>
+              </div>
+            </div>
+
+            <Button
+              size="lg"
+              className="w-full"
+              disabled={product.stock === 0 || addingToCart}
+              onClick={handleAddToCart}
+            >
               <ShoppingCart className="h-5 w-5 mr-2" />
-              Add to Cart
+              {addingToCart ? "Adding..." : "Add to Cart"}
             </Button>
           </div>
 

@@ -1,4 +1,4 @@
-import { Body, Controller, Headers, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { PaymentService } from './payment.service';
 import { AccessJwtGuard } from 'src/common/guards/acessJwt.guard';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
@@ -18,7 +18,6 @@ export class PaymentController {
 
   @Post('webhook')
   webhook(@Req() req: Request) {
-    console.log('111111111111');
     return this.paymentService.handleCallback(req.body as Buffer, req.headers);
   }
 }

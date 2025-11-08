@@ -11,7 +11,18 @@ export class CartService {
   async getUserCart(userId: string) {
     const cart = await this.prisma.cart.findUnique({
       where: { userId },
-      include: { cartItems: true },
+      include: {
+        cartItems: {
+          include: {
+            product: {
+              include: {
+                productImages: true,
+                Category: true,
+              },
+            },
+          },
+        },
+      },
     });
 
     return cart;
@@ -21,7 +32,10 @@ export class CartService {
     const { productId, quantity } = dto;
 
     const cart = await this.findOrCreateCart(userId);
-    return await this.addItemToExistingCart(cart, productId, quantity);
+    await this.addItemToExistingCart(cart, productId, quantity);
+
+    // Return updated cart with all relations
+    return await this.getUserCart(userId);
   }
 
   async updateCartItemQuantity(userId: string, dto: UpdateCartItemQuantity) {
@@ -34,7 +48,8 @@ export class CartService {
       data: { quantity },
     });
 
-    return cartItem;
+    // Return updated cart with all relations
+    return await this.getUserCart(userId);
   }
 
   async removeItemFromCart(userId: string, productId: string) {
@@ -44,7 +59,8 @@ export class CartService {
       where: { id: cartItem.id },
     });
 
-    return cartItem;
+    // Return updated cart with all relations
+    return await this.getUserCart(userId);
   }
 
   async cleanCart(userId: string) {

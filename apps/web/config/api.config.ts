@@ -16,4 +16,5 @@ export const API_URL = {
   user: (url = "") => `${SERVER_URL}/user/${url}`,
   product: (url = "") => `${SERVER_URL}/products/${url}`,
   category: (url = "") => `${SERVER_URL}/categories/${url}`,
+  cart: (url = "") => `${SERVER_URL}/cart/${url}`,
 };
