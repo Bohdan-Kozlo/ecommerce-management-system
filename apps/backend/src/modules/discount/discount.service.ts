@@ -143,7 +143,10 @@ export class DiscountService {
     });
 
     if (!promocode) {
-      throw new NotFoundException(`Promocode ${code} not found`);
+      return {
+        valid: false,
+        message: `Promocode '${code}' not found`,
+      };
     }
 
     if (!promocode.isActive) {
@@ -163,18 +166,26 @@ export class DiscountService {
     if (orderAmount < promocode.minOrderAmount) {
       return {
         valid: false,
-        message: `Minimum order amount for this promocode: ${promocode.minOrderAmount}`,
+        message: `Minimum order amount: $${promocode.minOrderAmount.toFixed(2)}`,
       };
     }
 
+    // Calculate discount amount (assuming value is a percentage)
+    const discountAmount = (orderAmount * promocode.value) / 100;
+
     return {
       valid: true,
-      message: 'Promocode is valid',
+      message: 'Promocode applied successfully',
       promocode: {
         id: promocode.id,
         code: promocode.code,
         value: promocode.value,
+        minOrderAmount: promocode.minOrderAmount,
+        maxUsage: promocode.maxUsage,
+        usedCount: promocode.usedCount,
+        isActive: promocode.isActive,
       },
+      discountAmount: parseFloat(discountAmount.toFixed(2)),
     };
   }
 }
