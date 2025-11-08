@@ -1,7 +1,8 @@
 "use client";
 
 import { useActionState } from "react";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { AuthDivider } from "@/components/auth/auth-divider";
 import { AuthShell } from "@/components/auth/auth-shell";
@@ -9,8 +10,8 @@ import { GoogleButton } from "@/components/auth/google-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getGoogleAuthUrl, register } from "@/services/auth/auth.service";
-import type { IAuthRegisterForm } from "@/shared/types/auth.interface";
+import { getGoogleAuthUrl, login } from "@/services/auth/auth.service";
+import type { IAuthLoginForm } from "@/shared/types/auth.interface";
 
 type FormState = {
   status: "idle" | "success" | "error";
@@ -21,38 +22,38 @@ const initialState: FormState = {
   status: "idle",
 };
 
-export default function Register() {
+export default function Login() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const from = searchParams.get("from") || "/";
 
   const [state, formAction, pending] = useActionState<FormState, FormData>(
     async (_prevState, formData) => {
-      const payload: IAuthRegisterForm = {
-        firstName: (formData.get("firstName") ?? "").toString().trim(),
-        lastName: (formData.get("lastName") ?? "").toString().trim(),
+      const payload: IAuthLoginForm = {
         email: (formData.get("email") ?? "").toString().trim(),
         password: (formData.get("password") ?? "").toString(),
       };
 
-      if (Object.values(payload).some((value) => !value)) {
+      if (!payload.email || !payload.password) {
         return {
           status: "error",
-          message: "Please complete all required fields.",
+          message: "Please fill in your email and password.",
         } satisfies FormState;
       }
 
       try {
-        await register(payload);
-        router.push("/");
+        await login(payload);
+        router.push(from);
         router.refresh();
         return {
           status: "success",
-          message: "Account created successfully.",
+          message: "Signed in successfully.",
         } satisfies FormState;
       } catch (error) {
         const message =
           error instanceof Error
             ? error.message
-            : "Unable to create account. Please try again.";
+            : "Unable to sign in. Please try again.";
         return {
           status: "error",
           message,
@@ -64,48 +65,24 @@ export default function Register() {
 
   return (
     <AuthShell
-      title="Create an account"
-      description="Set up your store profile in a few quick steps."
-      footerText="Already have an account?"
-      footerLink={{ href: "/auth/login", label: "Sign in" }}
+      title="Sign in"
+      description="Access your e-commerce dashboard and manage your store."
+      footerText="Don't have an account?"
+      footerLink={{ href: "/auth/register", label: "Create one" }}
     >
       <form className="space-y-6" noValidate action={formAction}>
         <div className="space-y-4">
           <GoogleButton
-            label="Sign up with Google"
+            label="Sign in with Google"
             onClick={(event) => {
               event.preventDefault();
-              window.location.href = getGoogleAuthUrl("/");
+              window.location.href = getGoogleAuthUrl(from);
             }}
           />
-          <AuthDivider label="or sign up with email" />
+          <AuthDivider label="or use your email" />
         </div>
 
         <div className="space-y-4 text-left">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <Label htmlFor="firstName">First name</Label>
-              <Input
-                id="firstName"
-                name="firstName"
-                autoComplete="given-name"
-                placeholder="John"
-                required
-                disabled={pending}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Last name</Label>
-              <Input
-                id="lastName"
-                name="lastName"
-                autoComplete="family-name"
-                placeholder="Doe"
-                required
-                disabled={pending}
-              />
-            </div>
-          </div>
           <div className="space-y-2">
             <Label htmlFor="email">Email address</Label>
             <Input
@@ -119,15 +96,21 @@ export default function Register() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password" hint="Minimum 8 characters">
-              Password
-            </Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password">Password</Label>
+              <Link
+                href="/auth/forgot-password"
+                className="text-xs font-medium text-foreground hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
             <Input
               id="password"
               name="password"
               type="password"
-              autoComplete="new-password"
-              placeholder="Create a password"
+              autoComplete="current-password"
+              placeholder="••••••••"
               minLength={8}
               required
               disabled={pending}
@@ -149,7 +132,7 @@ export default function Register() {
         ) : null}
 
         <Button type="submit" className="w-full" disabled={pending}>
-          {pending ? "Creating..." : "Create account"}
+          {pending ? "Signing in..." : "Continue"}
         </Button>
       </form>
     </AuthShell>

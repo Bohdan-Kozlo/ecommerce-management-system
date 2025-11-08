@@ -33,7 +33,7 @@ function redirectToLogin() {
 
 export async function apiFetch<T = unknown>(
   url: string,
-  options: FetchOptions = {}
+  options: FetchOptions
 ): Promise<T> {
   const { skipAuth = false, ...fetchOptions } = options;
 

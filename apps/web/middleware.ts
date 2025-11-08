@@ -32,19 +32,19 @@ export async function middleware(request: NextRequest) {
   try {
     await jwtVerify(token, secretKey);
 
-    return NextResponse.next();
-  } catch (error: any) {
-    if (error.code === "ERR_JWT_EXPIRED") {
+    const response = NextResponse.next();
+    response.headers.set("x-pathname", pathname);
+    return response;
+  } catch (error: unknown) {
+    const err = error as { code?: string; message?: string };
+    if (err.code === "ERR_JWT_EXPIRED") {
       console.log(
         "Middleware: Access token has expired, allowing request to continue for refresh..."
       );
       return NextResponse.next();
     }
 
-    console.error(
-      "Middleware: Invalid token (signature error?).",
-      error.message
-    );
+    console.error("Middleware: Invalid token (signature error?).", err.message);
     const response = NextResponse.redirect(loginUrl);
 
     response.cookies.delete(EnumTokens.REFRESH_TOKEN);
@@ -54,8 +54,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: [
-    "/profile",
-    "/((?!api|_next/static|_next/image|auth|favicon.ico).*)",
-  ],
+  matcher: ["/profile/:path*", "/orders/:path*", "/cart/:path*"],
 };

@@ -4,8 +4,8 @@ import type { PaymentEvent } from './payment-event.type';
 
 @Injectable()
 export class PaymentSubject {
-  private readonly observers = new Set<PaymentObserver>();
-  private readonly logger = new Logger(PaymentSubject.name);
+  private observers = new Set<PaymentObserver>();
+  private logger = new Logger(PaymentSubject.name);
 
   register(observer: PaymentObserver): void {
     this.observers.add(observer);

@@ -11,6 +11,7 @@ export interface GoogleAuthRequest extends Request {
     email: string;
     firstName: string;
     lastName: string;
+    redirectPath: string;
   };
 }
 

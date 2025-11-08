@@ -12,19 +12,21 @@ export class JwtTokenService {
   ) {}
 
   setRefreshTokenCookie(res: Response, refreshToken: string) {
+    const isProduction = this.configService.get('NODE_ENV') === 'production';
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: this.configService.get('NODE_ENV') === 'production',
-      sameSite: 'strict',
+      secure: isProduction,
+      sameSite: isProduction ? 'strict' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
   }
 
   setAccessTokenCookie(res: Response, accessToken: string) {
+    const isProduction = this.configService.get('NODE_ENV') === 'production';
     res.cookie('accessToken', accessToken, {
       httpOnly: true,
-      secure: this.configService.get('NODE_ENV') === 'production',
-      sameSite: 'strict',
+      secure: isProduction,
+      sameSite: isProduction ? 'strict' : 'lax',
       maxAge: 15 * 60 * 1000,
     });
   }

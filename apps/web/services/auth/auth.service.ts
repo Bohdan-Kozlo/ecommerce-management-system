@@ -5,12 +5,12 @@ import type {
   IAuthResponse,
 } from "@/shared/types/auth.interface";
 
-interface AuthRequestOptions<TBody extends object> {
+interface AuthRequestOptions<TBody> {
   endpoint: string;
   body: TBody;
 }
 
-async function request<TResponse, TBody extends object>({
+async function request<TResponse, TBody>({
   endpoint,
   body,
 }: AuthRequestOptions<TBody>): Promise<TResponse> {

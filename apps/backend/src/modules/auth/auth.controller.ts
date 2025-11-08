@@ -56,8 +56,9 @@ export class AuthController {
     this.jwtTokenService.setAccessTokenCookie(res, result.accessToken);
 
     const frontendUrl = this.configService.getOrThrow<string>('FRONTEND_URL');
+    const redirectPath = req.user.redirectPath || '/';
 
-    return res.redirect(`${frontendUrl}/`);
+    return res.redirect(`${frontendUrl}${redirectPath}`);
   }
 
   @UseGuards(RefreshJwtGuard)
