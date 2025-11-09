@@ -77,12 +77,6 @@ export function Header() {
             Home
           </Link>
           <Link
-            href="/categories"
-            className="text-sm font-medium text-foreground transition-colors hover:text-foreground/80"
-          >
-            Categories
-          </Link>
-          <Link
             href="/products"
             className="text-sm font-medium text-foreground transition-colors hover:text-foreground/80"
           >

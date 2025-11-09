@@ -12,12 +12,15 @@ export enum DeliveryMethod {
   DEPARTMENT = "DEPARTMENT",
 }
 
+import type { IProduct } from "./product.interface";
+
 export interface IOrderItem {
   id: string;
   orderId: string;
   productId: string;
   quantity: number;
   price: number;
+  product?: IProduct;
 }
 
 export interface IDelivery {
@@ -27,6 +30,16 @@ export interface IDelivery {
   email: string;
   phone?: string;
   method: DeliveryMethod;
+}
+
+export interface IPromocode {
+  id: string;
+  code: string;
+  value: number;
+  minOrderAmount: number;
+  maxUsage: number;
+  usedCount: number;
+  isActive: boolean;
 }
 
 export interface IOrder {
@@ -39,6 +52,7 @@ export interface IOrder {
   updatedAt: Date;
   orderItems: IOrderItem[];
   delivery?: IDelivery;
+  promocode?: IPromocode;
 }
 
 export interface ICreateOrderDto {
