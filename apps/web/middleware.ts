@@ -30,7 +30,17 @@ export async function middleware(request: NextRequest) {
   }
 
   try {
-    await jwtVerify(token, secretKey);
+    const { payload } = await jwtVerify(token, secretKey);
+
+    // Check if accessing admin routes
+    if (pathname.startsWith("/admin")) {
+      const role = payload.role as string;
+
+      if (role !== "ADMIN") {
+        console.warn("Middleware: User is not an admin, redirecting to home");
+        return NextResponse.redirect(new URL("/", request.url));
+      }
+    }
 
     const response = NextResponse.next();
     response.headers.set("x-pathname", pathname);
@@ -47,7 +57,9 @@ export async function middleware(request: NextRequest) {
     console.error("Middleware: Invalid token (signature error?).", err.message);
     const response = NextResponse.redirect(loginUrl);
 
+    // Clear both tokens to prevent infinite redirect loop
     response.cookies.delete(EnumTokens.REFRESH_TOKEN);
+    response.cookies.delete(EnumTokens.ACCESS_TOKEN);
 
     return response;
   }
@@ -59,5 +71,6 @@ export const config = {
     "/orders/:path*",
     "/cart/:path*",
     "/checkout/:path*",
+    "/admin/:path*",
   ],
 };

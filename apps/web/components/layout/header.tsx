@@ -29,8 +29,9 @@ export function Header() {
       try {
         const data = await getCurrentUser();
         setUser(data);
-      } catch (error) {
-        console.error("Failed to fetch user:", error);
+      } catch {
+        // User is not authenticated, that's ok
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -44,26 +45,15 @@ export function Header() {
       await apiFetch(API_URL.auth("logout"), {
         method: "POST",
       });
+      setUser(null);
       router.push("/auth/login");
       router.refresh();
-    } catch {
+    } catch (error) {
+      console.error("Logout error:", error);
+      setUser(null);
       router.push("/auth/login");
+      router.refresh();
     }
-  }
-
-  if (loading) {
-    return (
-      <header className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
-        <div className="container flex h-14 items-center justify-between px-6">
-          <div className="h-5 w-32 bg-muted animate-pulse rounded" />
-          <div className="h-9 w-24 bg-muted animate-pulse rounded" />
-        </div>
-      </header>
-    );
-  }
-
-  if (!user) {
-    return null;
   }
 
   return (
@@ -85,48 +75,67 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <Link href="/orders">
-            <Button variant="ghost" size="icon" className="relative">
-              <Package className="h-5 w-5" />
-              <span className="sr-only">Orders</span>
-            </Button>
-          </Link>
+          {loading ? (
+            <>
+              <div className="h-9 w-9 bg-muted animate-pulse rounded" />
+              <div className="h-9 w-9 bg-muted animate-pulse rounded" />
+              <div className="h-9 w-24 bg-muted animate-pulse rounded" />
+            </>
+          ) : user ? (
+            <>
+              <Link href="/orders">
+                <Button variant="ghost" size="icon" className="relative">
+                  <Package className="h-5 w-5" />
+                  <span className="sr-only">Orders</span>
+                </Button>
+              </Link>
 
-          <Link href="/cart">
-            <Button variant="ghost" size="icon" className="relative">
-              <ShoppingCart className="h-5 w-5" />
-              <span className="sr-only">Cart</span>
-            </Button>
-          </Link>
+              <Link href="/cart">
+                <Button variant="ghost" size="icon" className="relative">
+                  <ShoppingCart className="h-5 w-5" />
+                  <span className="sr-only">Cart</span>
+                </Button>
+              </Link>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="gap-2">
-                <User className="h-4 w-4" />
-                <span className="hidden sm:inline">
-                  {user.firstName} {user.lastName}
-                </span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              <DropdownMenuLabel>My Account</DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href="/profile" className="cursor-pointer">
-                  <User className="mr-2 h-4 w-4" />
-                  Profile
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                onClick={handleLogout}
-                className="cursor-pointer text-destructive focus:text-destructive"
-              >
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="gap-2">
+                    <User className="h-4 w-4" />
+                    <span className="hidden sm:inline">
+                      {user.firstName} {user.lastName}
+                    </span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/profile" className="cursor-pointer">
+                      <User className="mr-2 h-4 w-4" />
+                      Profile
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onClick={handleLogout}
+                    className="cursor-pointer text-destructive focus:text-destructive"
+                  >
+                    <LogOut className="mr-2 h-4 w-4" />
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </>
+          ) : (
+            <>
+              <Link href="/auth/login">
+                <Button variant="ghost">Login</Button>
+              </Link>
+              <Link href="/auth/register">
+                <Button>Sign Up</Button>
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>
