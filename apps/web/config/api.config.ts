@@ -18,4 +18,6 @@ export const API_URL = {
   category: (url = "") => `${SERVER_URL}/categories/${url}`,
   cart: (url = "") => `${SERVER_URL}/cart/${url}`,
   discount: (url = "") => `${SERVER_URL}/discounts/${url}`,
+  order: (url = "") => `${SERVER_URL}/orders/${url}`,
+  payment: (url = "") => `${SERVER_URL}/payments/${url}`,
 };

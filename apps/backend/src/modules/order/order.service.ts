@@ -67,7 +67,11 @@ export class OrderService {
   async getUserOrders(userId: string) {
     const orders = await this.prisma.order.findMany({
       where: { userId },
-      include: { orderItems: true },
+      include: {
+        orderItems: true,
+        delivery: true,
+      },
+      orderBy: { createdAt: 'desc' },
     });
 
     if (!orders || orders.length === 0) {

@@ -3,15 +3,7 @@
 import { useEffect, useState, useOptimistic, startTransition } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import {
-  Trash2,
-  Plus,
-  Minus,
-  ShoppingBag,
-  AlertCircle,
-  Tag,
-  X,
-} from "lucide-react";
+import { Trash2, Plus, Minus, ShoppingBag, AlertCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -29,10 +21,6 @@ import {
   cleanCart,
 } from "@/services/cart/cart.service";
 import type { ICart, ICartItem } from "@/shared/types/cart.interface";
-import {
-  validatePromocode,
-  type IPromocodeValidationResponse,
-} from "@/services/discount/discount.service";
 
 type OptimisticAction =
   | { type: "update"; productId: string; quantity: number }
@@ -43,10 +31,6 @@ export default function CartPage() {
   const router = useRouter();
   const [cart, setCart] = useState<ICart | null>(null);
   const [loading, setLoading] = useState(true);
-  const [promocode, setPromocode] = useState("");
-  const [promocodeLoading, setPromocodeLoading] = useState(false);
-  const [appliedPromocode, setAppliedPromocode] =
-    useState<IPromocodeValidationResponse | null>(null);
 
   const [optimisticCart, setOptimisticCart] = useOptimistic(
     cart,
@@ -173,36 +157,6 @@ export default function CartPage() {
     }
   }
 
-  async function handleApplyPromocode() {
-    if (!promocode.trim()) return;
-
-    setPromocodeLoading(true);
-    try {
-      const result = await validatePromocode({
-        code: promocode.trim(),
-        orderAmount: subtotalPrice,
-      });
-
-      if (result.valid) {
-        setAppliedPromocode(result);
-      } else {
-        alert(result.message || "Invalid promocode");
-        setAppliedPromocode(null);
-      }
-    } catch (error) {
-      console.error("Failed to validate promocode:", error);
-      alert("Failed to validate promocode");
-      setAppliedPromocode(null);
-    } finally {
-      setPromocodeLoading(false);
-    }
-  }
-
-  function handleRemovePromocode() {
-    setPromocode("");
-    setAppliedPromocode(null);
-  }
-
   function handleCheckout() {
     router.push("/checkout");
   }
@@ -213,8 +167,6 @@ export default function CartPage() {
     (sum, item) => sum + (item.product?.price || 0) * item.quantity,
     0
   );
-  const discountAmount = appliedPromocode?.discountAmount || 0;
-  const totalPrice = subtotalPrice - discountAmount;
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   if (loading) {
@@ -288,70 +240,6 @@ export default function CartPage() {
                 </span>
                 <span className="font-medium">${subtotalPrice.toFixed(2)}</span>
               </div>
-
-              {/* Promocode Section */}
-              <div className="border-t pt-4 space-y-3">
-                <p className="text-sm font-medium flex items-center gap-2">
-                  <Tag className="h-4 w-4" />
-                  Promo Code
-                </p>
-
-                {appliedPromocode?.valid ? (
-                  <div className="bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg p-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <Tag className="h-4 w-4 text-green-600 dark:text-green-400" />
-                        <span className="text-sm font-medium text-green-600 dark:text-green-400">
-                          {appliedPromocode.promocode?.code}
-                        </span>
-                      </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-6 w-6"
-                        onClick={handleRemovePromocode}
-                      >
-                        <X className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <p className="text-xs text-green-600 dark:text-green-400">
-                      -{discountAmount.toFixed(2)}$ discount applied
-                    </p>
-                  </div>
-                ) : (
-                  <div className="flex gap-2">
-                    <Input
-                      placeholder="Enter code"
-                      value={promocode}
-                      onChange={(e) =>
-                        setPromocode(e.target.value.toUpperCase())
-                      }
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          handleApplyPromocode();
-                        }
-                      }}
-                      disabled={promocodeLoading}
-                      className="flex-1"
-                    />
-                    <Button
-                      onClick={handleApplyPromocode}
-                      disabled={!promocode.trim() || promocodeLoading}
-                      variant="secondary"
-                    >
-                      {promocodeLoading ? "Applying..." : "Apply"}
-                    </Button>
-                  </div>
-                )}
-              </div>
-
-              {appliedPromocode?.valid && (
-                <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
-                  <span>Discount</span>
-                  <span>-${discountAmount.toFixed(2)}</span>
-                </div>
-              )}
-
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Shipping</span>
                 <span className="font-medium">Calculated at checkout</span>
@@ -360,7 +248,7 @@ export default function CartPage() {
               <div className="border-t pt-4">
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span>${totalPrice.toFixed(2)}</span>
+                  <span>${subtotalPrice.toFixed(2)}</span>
                 </div>
               </div>
               <div className="flex items-start gap-2 text-xs text-muted-foreground bg-muted p-3 rounded">

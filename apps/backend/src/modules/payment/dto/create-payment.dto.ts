@@ -36,10 +36,6 @@ export class CreatePaymentDto {
   @IsNotEmpty()
   provider!: string;
 
-  @IsNotEmpty()
-  @IsNumber()
-  amount!: number;
-
   @IsString()
   @IsNotEmpty()
   currency!: string;
