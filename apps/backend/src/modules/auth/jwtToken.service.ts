@@ -18,6 +18,7 @@ export class JwtTokenService {
       secure: isProduction,
       sameSite: isProduction ? 'strict' : 'lax',
       maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
     });
   }
 
@@ -28,15 +29,28 @@ export class JwtTokenService {
       secure: isProduction,
       sameSite: isProduction ? 'strict' : 'lax',
       maxAge: 15 * 60 * 1000,
+      path: '/',
     });
   }
 
   clearRefreshTokenCookie(res: Response) {
-    res.clearCookie('refreshToken');
+    const isProduction = this.configService.get('NODE_ENV') === 'production';
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'strict' : 'lax',
+      path: '/',
+    });
   }
 
   clearAccessTokenCookie(res: Response) {
-    res.clearCookie('accessToken');
+    const isProduction = this.configService.get('NODE_ENV') === 'production';
+    res.clearCookie('accessToken', {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'strict' : 'lax',
+      path: '/',
+    });
   }
 
   async generateTokens(userId: string, role: Role) {

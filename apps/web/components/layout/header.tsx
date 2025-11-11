@@ -30,7 +30,6 @@ export function Header() {
         const data = await getCurrentUser();
         setUser(data);
       } catch {
-        // User is not authenticated, that's ok
         setUser(null);
       } finally {
         setLoading(false);

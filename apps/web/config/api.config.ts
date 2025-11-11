@@ -20,4 +20,5 @@ export const API_URL = {
   discount: (url = "") => `${SERVER_URL}/discounts/${url}`,
   order: (url = "") => `${SERVER_URL}/orders/${url}`,
   payment: (url = "") => `${SERVER_URL}/payments/${url}`,
+  report: (url = "") => `${SERVER_URL}/reports/${url}`,
 };

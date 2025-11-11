@@ -32,7 +32,6 @@ export async function middleware(request: NextRequest) {
   try {
     const { payload } = await jwtVerify(token, secretKey);
 
-    // Check if accessing admin routes
     if (pathname.startsWith("/admin")) {
       const role = payload.role as string;
 
@@ -57,7 +56,6 @@ export async function middleware(request: NextRequest) {
     console.error("Middleware: Invalid token (signature error?).", err.message);
     const response = NextResponse.redirect(loginUrl);
 
-    // Clear both tokens to prevent infinite redirect loop
     response.cookies.delete(EnumTokens.REFRESH_TOKEN);
     response.cookies.delete(EnumTokens.ACCESS_TOKEN);
 

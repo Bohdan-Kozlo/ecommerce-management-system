@@ -26,17 +26,6 @@ async function refreshTokens(): Promise<boolean> {
   }
 }
 
-function redirectToLogin() {
-  // Don't redirect if already on login page
-  if (
-    typeof window !== "undefined" &&
-    !window.location.pathname.includes("/auth/login")
-  ) {
-    window.location.href = "/auth/login";
-  }
-  throw new Error("Redirecting to login...");
-}
-
 export async function apiFetch<T = unknown>(
   url: string,
   options: FetchOptions
@@ -55,8 +44,7 @@ export async function apiFetch<T = unknown>(
   const fullUrl = url.startsWith("http") ? url : `${SERVER_URL}${url}`;
   let response = await fetch(fullUrl, finalOptions);
 
-  // Don't try to refresh tokens if we're on the login/register/public pages
-  const publicPages = ["/auth/login", "/auth/register", "/", "/products"];
+  const publicPages = ["/auth/login", "/auth/register"];
   const isPublicPage =
     typeof window !== "undefined" &&
     publicPages.some((page) => {
@@ -78,14 +66,14 @@ export async function apiFetch<T = unknown>(
     const refreshSucceeded = await refreshPromise;
 
     if (!refreshSucceeded) {
-      redirectToLogin();
+      return null as T;
     }
 
     response = await fetch(fullUrl, finalOptions);
   }
 
   if (response.status === 401 && !skipAuth && !isPublicPage) {
-    redirectToLogin();
+    return null as T;
   }
 
   if (!response.ok) {
