@@ -1,8 +1,8 @@
 import { Module, Global } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { StorageClient } from '@supabase/storage-js';
-import { SupabaseStorageService } from '../supabaseStorage/supabaseStorage.service';
-import { SUPABASE_CLIENT } from '../supabaseStorage/supabase.constant';
+import { SupabaseStorageService } from './supabaseStorage.service';
+import { SUPABASE_CLIENT } from './supabase.constant';
 
 @Global()
 @Module({

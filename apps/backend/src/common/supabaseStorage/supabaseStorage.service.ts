@@ -4,7 +4,7 @@ import { randomUUID } from 'crypto';
 import { SUPABASE_CLIENT } from './supabase.constant';
 
 @Injectable()
-export class SupabaseService {
+export class SupabaseStorageService {
   private readonly bucketName = 'products';
 
   constructor(@Inject(SUPABASE_CLIENT) private storage: StorageClient) {}

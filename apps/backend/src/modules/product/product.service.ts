@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma/prisma.service';
-import { SupabaseService } from 'src/common/supabase/supabase.service';
+import { SupabaseStorageService } from 'src/common/supabaseStorage/supabaseStorage.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { QueryProductsDto } from './dto/query-products.dto';
@@ -10,7 +10,7 @@ import { Prisma } from '@prisma/client';
 export class ProductService {
   constructor(
     private prisma: PrismaService,
-    private supabase: SupabaseService,
+    private supabase: SupabaseStorageService,
   ) {}
 
   async create(createProductDto: CreateProductDto, imageFiles?: Express.Multer.File[]) {
