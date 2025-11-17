@@ -8,13 +8,17 @@ import {
   Param,
   Query,
   UseGuards,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
+import { FilesInterceptor } from '@nestjs/platform-express';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { QueryProductsDto } from './dto/query-products.dto';
 import { AccessJwtGuard } from 'src/common/guards/acessJwt.guard';
 import { AdminGuard } from 'src/common/guards/admin.guard';
+import { imageFileFilter, fileSizeLimit } from 'src/common/utils/file-upload.utils';
 
 @Controller('products')
 export class ProductController {
@@ -32,14 +36,33 @@ export class ProductController {
 
   @Post()
   @UseGuards(AccessJwtGuard, AdminGuard)
-  create(@Body() createProductDto: CreateProductDto) {
-    return this.productService.create(createProductDto);
+  @UseInterceptors(
+    FilesInterceptor('images', 10, {
+      fileFilter: imageFileFilter,
+      limits: { fileSize: fileSizeLimit },
+    }),
+  )
+  create(
+    @Body() createProductDto: CreateProductDto,
+    @UploadedFiles() images?: Express.Multer.File[],
+  ) {
+    return this.productService.create(createProductDto, images);
   }
 
   @Patch(':id')
   @UseGuards(AccessJwtGuard, AdminGuard)
-  update(@Param('id') id: string, @Body() updateProductDto: UpdateProductDto) {
-    return this.productService.update(id, updateProductDto);
+  @UseInterceptors(
+    FilesInterceptor('images', 10, {
+      fileFilter: imageFileFilter,
+      limits: { fileSize: fileSizeLimit },
+    }),
+  )
+  update(
+    @Param('id') id: string,
+    @Body() updateProductDto: UpdateProductDto,
+    @UploadedFiles() images?: Express.Multer.File[],
+  ) {
+    return this.productService.update(id, updateProductDto, images);
   }
 
   @Delete(':id')

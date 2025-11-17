@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from 'src/common/prisma/prisma.service';
+import { SupabaseService } from 'src/common/supabase/supabase.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { QueryProductsDto } from './dto/query-products.dto';
@@ -7,25 +8,46 @@ import { Prisma } from '@prisma/client';
 
 @Injectable()
 export class ProductService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private supabase: SupabaseService,
+  ) {}
 
-  async create(createProductDto: CreateProductDto) {
-    const { images, ...productData } = createProductDto;
+  async create(createProductDto: CreateProductDto, imageFiles?: Express.Multer.File[]) {
+    try {
+      const { images, ...productData } = createProductDto;
 
-    const product = await this.prisma.product.create({
-      data: productData,
-    });
-
-    if (images && images.length > 0) {
-      await this.prisma.productImage.createMany({
-        data: images.map((url) => ({ url, productId: product.id })),
+      const product = await this.prisma.product.create({
+        data: productData,
       });
-    }
 
-    return this.prisma.product.findUnique({
-      where: { id: product.id },
-      include: { productImages: true, Category: true },
-    });
+      const uploadedImageUrls: string[] = [];
+      if (imageFiles && imageFiles.length > 0) {
+        for (const file of imageFiles) {
+          const url = await this.supabase.uploadFile(file);
+          uploadedImageUrls.push(url);
+        }
+      }
+
+      if (images && images.length > 0) {
+        uploadedImageUrls.push(...images);
+      }
+
+      if (uploadedImageUrls.length > 0) {
+        await this.prisma.productImage.createMany({
+          data: uploadedImageUrls.map((url) => ({ url, productId: product.id })),
+        });
+      }
+
+      return this.prisma.product.findUnique({
+        where: { id: product.id },
+        include: { productImages: true, Category: true },
+      });
+    } catch (error) {
+      throw new Error(
+        `Failed to create product: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    }
   }
 
   async findById(id: string) {
@@ -95,31 +117,57 @@ export class ProductService {
     };
   }
 
-  async update(id: string, updateProductDto: UpdateProductDto) {
-    const { images, ...updateData } = updateProductDto;
+  async update(id: string, updateProductDto: UpdateProductDto, imageFiles?: Express.Multer.File[]) {
+    try {
+      const { images, ...updateData } = updateProductDto;
 
-    await this.findById(id);
+      await this.findById(id);
 
-    await this.prisma.product.update({
-      where: { id },
-      data: updateData,
-    });
-
-    if (images !== undefined) {
-      await this.prisma.productImage.deleteMany({
-        where: { productId: id },
+      await this.prisma.product.update({
+        where: { id },
+        data: updateData,
       });
-      if (images.length > 0) {
-        await this.prisma.productImage.createMany({
-          data: images.map((url) => ({ url, productId: id })),
-        });
-      }
-    }
 
-    return this.prisma.product.findUnique({
-      where: { id },
-      include: { productImages: true, Category: true },
-    });
+      if (imageFiles && imageFiles.length > 0) {
+        const uploadedImageUrls: string[] = [];
+        for (const file of imageFiles) {
+          const url = await this.supabase.uploadFile(file);
+          uploadedImageUrls.push(url);
+        }
+
+        const existingImageUrls = images || [];
+        const allImageUrls = [...existingImageUrls, ...uploadedImageUrls];
+
+        await this.prisma.productImage.deleteMany({
+          where: { productId: id },
+        });
+
+        if (allImageUrls.length > 0) {
+          await this.prisma.productImage.createMany({
+            data: allImageUrls.map((url) => ({ url, productId: id })),
+          });
+        }
+      } else if (images !== undefined) {
+        await this.prisma.productImage.deleteMany({
+          where: { productId: id },
+        });
+
+        if (images.length > 0) {
+          await this.prisma.productImage.createMany({
+            data: images.map((url) => ({ url, productId: id })),
+          });
+        }
+      }
+
+      return this.prisma.product.findUnique({
+        where: { id },
+        include: { productImages: true, Category: true },
+      });
+    } catch (error) {
+      throw new Error(
+        `Failed to update product: ${error instanceof Error ? error.message : 'Unknown error'}`,
+      );
+    }
   }
 
   async delete(id: string) {

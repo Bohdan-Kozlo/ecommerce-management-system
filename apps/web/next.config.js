@@ -16,6 +16,11 @@ const nextConfig = {
         hostname: 'loremflickr.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'snamizkalssemrhgaccl.supabase.co',
+        pathname: '/storage/v1/**',
+      }
     ],
   },
 };
