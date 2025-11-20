@@ -19,6 +19,22 @@ export const API_URL = {
   cart: (url = "") => `${SERVER_URL}/cart/${url}`,
   discount: (url = "") => `${SERVER_URL}/discounts/${url}`,
   order: (url = "") => `${SERVER_URL}/orders/${url}`,
+  orderAdmin: {
+    all: (params?: { status?: string; page?: number; limit?: number }) => {
+      const queryParams = new URLSearchParams();
+      if (params?.status) queryParams.append("status", params.status);
+      if (params?.page) queryParams.append("page", params.page.toString());
+      if (params?.limit) queryParams.append("limit", params.limit.toString());
+      const query = queryParams.toString();
+      return `${SERVER_URL}/orders/admin/all${query ? `?${query}` : ""}`;
+    },
+    byId: (orderId: string) => `${SERVER_URL}/orders/admin/${orderId}`,
+    updateStatus: (orderId: string) =>
+      `${SERVER_URL}/orders/admin/${orderId}/status`,
+    updateDelivery: (orderId: string) =>
+      `${SERVER_URL}/orders/admin/${orderId}/delivery`,
+    cancel: (orderId: string) => `${SERVER_URL}/orders/admin/${orderId}/cancel`,
+  },
   payment: (url = "") => `${SERVER_URL}/payments/${url}`,
   report: (url = "") => `${SERVER_URL}/reports/${url}`,
 };

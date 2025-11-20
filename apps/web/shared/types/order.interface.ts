@@ -64,3 +64,61 @@ export interface ICreateOrderDto {
     method: DeliveryMethod;
   };
 }
+
+// Admin interfaces
+export interface IOrderItemAdmin {
+  id: string;
+  quantity: number;
+  price: number;
+  product?: {
+    title: string;
+    productImages?: Array<{ url: string }>;
+  };
+}
+
+export interface IDeliveryAdmin {
+  address: string;
+  email: string;
+  phone?: string;
+  method: DeliveryMethod;
+}
+
+export interface IOrderAdmin {
+  id: string;
+  status: OrderStatus;
+  totalAmount: number;
+  createdAt: string;
+  user: {
+    id: string;
+    email: string;
+    firstName?: string;
+    lastName?: string;
+  };
+  orderItems: IOrderItemAdmin[];
+  delivery: IDeliveryAdmin;
+  promocode?: {
+    code: string;
+    value: number;
+  };
+}
+
+export interface IGetAllOrdersParams {
+  status?: string;
+  page?: number;
+  limit?: number;
+}
+
+export interface IGetAllOrdersResponse {
+  orders: IOrderAdmin[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface IUpdateDeliveryDto {
+  address?: string;
+  email?: string;
+  phone?: string;
+  method?: string;
+}
