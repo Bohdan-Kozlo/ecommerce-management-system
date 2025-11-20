@@ -30,3 +30,87 @@ export async function getProducts(
 export async function getProductById(id: string): Promise<IProduct> {
   return apiFetch<IProduct>(API_URL.product(id), { method: "GET" });
 }
+
+export interface ICreateProductData {
+  name: string;
+  description?: string;
+  price: number;
+  stock: number;
+  categoryId?: string;
+  images?: File[];
+}
+
+export interface IUpdateProductData {
+  name?: string;
+  description?: string;
+  price?: number;
+  stock?: number;
+  categoryId?: string;
+  images?: File[];
+  existingImageUrls?: string[];
+}
+
+export async function createProduct(
+  data: ICreateProductData
+): Promise<IProduct> {
+  const formData = new FormData();
+
+  formData.append("name", data.name);
+  if (data.description) formData.append("description", data.description);
+  formData.append("price", data.price.toString());
+  formData.append("stock", data.stock.toString());
+  if (data.categoryId) formData.append("categoryId", data.categoryId);
+
+  if (data.images && data.images.length > 0) {
+    data.images.forEach((file) => {
+      formData.append("images", file);
+    });
+  }
+
+  return apiFetch<IProduct>(API_URL.product(), {
+    method: "POST",
+    body: formData,
+    headers: {},
+  });
+}
+
+export async function updateProduct(
+  id: string,
+  data: IUpdateProductData
+): Promise<IProduct> {
+  const formData = new FormData();
+
+  if (data.name) formData.append("name", data.name);
+  if (data.description !== undefined)
+    formData.append("description", data.description);
+  if (data.price !== undefined) formData.append("price", data.price.toString());
+  if (data.stock !== undefined) formData.append("stock", data.stock.toString());
+  if (data.categoryId !== undefined)
+    formData.append("categoryId", data.categoryId);
+
+  if (data.existingImageUrls && data.existingImageUrls.length > 0) {
+    data.existingImageUrls.forEach((url) => {
+      formData.append("images", url);
+    });
+  }
+
+  if (data.images && data.images.length > 0) {
+    data.images.forEach((file) => {
+      formData.append("images", file);
+    });
+  }
+
+  return apiFetch<IProduct>(API_URL.product(id), {
+    method: "PATCH",
+    body: formData,
+    headers: {},
+  });
+}
+
+export async function deleteProduct(
+  id: string
+): Promise<{ productId: string }> {
+  return apiFetch<{ productId: string }>(API_URL.product(id), {
+    method: "DELETE",
+  });
+}

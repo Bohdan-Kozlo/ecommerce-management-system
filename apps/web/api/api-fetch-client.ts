@@ -33,7 +33,10 @@ export async function apiFetch<T = unknown>(
   const { skipAuth = false, ...fetchOptions } = options;
 
   const headers = new Headers(fetchOptions.headers as HeadersInit);
-  headers.set("Content-Type", "application/json");
+
+  if (!(fetchOptions.body instanceof FormData)) {
+    headers.set("Content-Type", "application/json");
+  }
 
   const finalOptions: RequestInit = {
     ...fetchOptions,
@@ -44,7 +47,7 @@ export async function apiFetch<T = unknown>(
   const fullUrl = url.startsWith("http") ? url : `${SERVER_URL}${url}`;
   let response = await fetch(fullUrl, finalOptions);
 
-  const publicPages = ["/auth/login", "/auth/register"];
+  const publicPages = ["/auth/login", "/auth/register", "/", "/products"];
   const isPublicPage =
     typeof window !== "undefined" &&
     publicPages.some((page) => {
