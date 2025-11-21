@@ -9,7 +9,7 @@ import { GoogleButton } from "@/components/auth/google-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getGoogleAuthUrl, register } from "@/services/auth/auth.service";
+import { getGoogleAuthUrl, register } from "@/services/auth.service";
 import type { IAuthRegisterForm } from "@/shared/types/auth.interface";
 
 type FormState = {

@@ -1,10 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  getSalesByCategory,
-  SalesByCategory,
-} from "@/services/report/report.service";
+import { getSalesByCategory, SalesByCategory } from "@/services/report.service";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartConfig,

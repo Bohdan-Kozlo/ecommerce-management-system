@@ -1,5 +1,3 @@
-"use client";
-
 import { API_URL, SERVER_URL } from "@/config/api.config";
 
 interface FetchOptions extends RequestInit {
@@ -9,83 +7,90 @@ interface FetchOptions extends RequestInit {
 let isRefreshing = false;
 let refreshPromise: Promise<boolean> | null = null;
 
-async function refreshTokens(): Promise<boolean> {
-  try {
-    const response = await fetch(API_URL.auth("refresh"), {
-      method: "POST",
-      credentials: "include",
-    });
-
-    if (!response.ok) {
-      return false;
-    }
-
-    return true;
-  } catch {
-    return false;
-  }
-}
-
 export async function apiFetch<T = unknown>(
   url: string,
-  options: FetchOptions
-): Promise<T> {
-  const { skipAuth = false, ...fetchOptions } = options;
+  options: FetchOptions = {}
+): Promise<T | null> {
+  const requestUrl = buildUrl(url);
+  const finalOptions = prepareOptions(options);
 
-  const headers = new Headers(fetchOptions.headers as HeadersInit);
+  let response = await fetch(requestUrl, finalOptions);
 
-  if (!(fetchOptions.body instanceof FormData)) {
-    headers.set("Content-Type", "application/json");
-  }
+  const shouldHandle401 =
+    response.status === 401 && !options.skipAuth && !isPublicPage();
 
-  const finalOptions: RequestInit = {
-    ...fetchOptions,
-    headers,
-    credentials: skipAuth ? "omit" : "include",
-  };
+  if (shouldHandle401) {
+    const refreshed = await refreshTokens();
 
-  const fullUrl = url.startsWith("http") ? url : `${SERVER_URL}${url}`;
-  let response = await fetch(fullUrl, finalOptions);
+    if (!refreshed) return null;
 
-  const publicPages = ["/auth/login", "/auth/register", "/", "/products"];
-  const isPublicPage =
-    typeof window !== "undefined" &&
-    publicPages.some((page) => {
-      if (page === "/") {
-        return window.location.pathname === "/";
-      }
-      return window.location.pathname.includes(page);
-    });
+    response = await fetch(requestUrl, finalOptions);
 
-  if (response.status === 401 && !skipAuth && !isPublicPage) {
-    if (!isRefreshing) {
-      isRefreshing = true;
-      refreshPromise = refreshTokens().finally(() => {
-        isRefreshing = false;
-        refreshPromise = null;
-      });
+    if (response.status === 401) {
+      return null;
     }
-
-    const refreshSucceeded = await refreshPromise;
-
-    if (!refreshSucceeded) {
-      return null as T;
-    }
-
-    response = await fetch(fullUrl, finalOptions);
-  }
-
-  if (response.status === 401 && !skipAuth && !isPublicPage) {
-    return null as T;
   }
 
   if (!response.ok) {
     throw new Error(`HTTP error! status: ${response.status}`);
   }
 
-  if (response.status === 204) {
-    return null as T;
-  }
+  if (response.status === 204) return null;
 
   return response.json() as Promise<T>;
+}
+
+function refreshTokens(): Promise<boolean> {
+  if (!isRefreshing) {
+    isRefreshing = true;
+
+    refreshPromise = (async () => {
+      try {
+        const res = await fetch(API_URL.auth("refresh"), {
+          method: "POST",
+          credentials: "include",
+        });
+
+        return res.ok;
+      } catch {
+        return false;
+      } finally {
+        isRefreshing = false;
+        refreshPromise = null;
+      }
+    })();
+  }
+
+  return refreshPromise!;
+}
+
+const PUBLIC_PAGES = ["/auth/login", "/auth/register"];
+
+function isPublicPage(): boolean {
+  if (typeof window === "undefined") return false;
+
+  const path = window.location.pathname;
+
+  return PUBLIC_PAGES.some((page) =>
+    page === "/" ? path === "/" : path.startsWith(page)
+  );
+}
+
+function buildUrl(url: string): string {
+  return url.startsWith("http") ? url : `${SERVER_URL}${url}`;
+}
+
+function prepareOptions(options: FetchOptions): RequestInit {
+  const { skipAuth = false, ...rest } = options;
+
+  const headers = new Headers(rest.headers as HeadersInit);
+  if (!(rest.body instanceof FormData)) {
+    headers.set("Content-Type", "application/json");
+  }
+
+  return {
+    ...rest,
+    headers,
+    credentials: skipAuth ? "omit" : "include",
+  };
 }

@@ -1,4 +1,10 @@
-import { BarChart3, Package, TrendingUp } from "lucide-react";
+import {
+  Apple,
+  BarChart3,
+  Package,
+  PackageSearch,
+  TrendingUp,
+} from "lucide-react";
 import Link from "next/link";
 
 export default function AdminHeader() {
@@ -31,6 +37,20 @@ export default function AdminHeader() {
               >
                 <Package className="h-4 w-4" />
                 Top Products
+              </Link>
+              <Link
+                href="/admin/products"
+                className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Apple className="h-4 w-4" />
+                Manage Products
+              </Link>
+              <Link
+                href="/admin/orders"
+                className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <PackageSearch className="h-4 w-4" />
+                Manage Orders
               </Link>
             </nav>
           </div>

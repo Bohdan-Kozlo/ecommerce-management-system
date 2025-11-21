@@ -23,13 +23,13 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getUserCart } from "@/services/cart/cart.service";
+import { getUserCart } from "@/services/cart.service";
 import {
   validatePromocode,
   type IPromocodeValidationResponse,
-} from "@/services/discount/discount.service";
-import { createOrder } from "@/services/order/order.service";
-import { createPayment } from "@/services/payment/payment.service";
+} from "@/services/discount.service";
+import { createOrder } from "@/services/order.service";
+import { createPayment } from "@/services/payment.service";
 import type { ICart } from "@/shared/types/cart.interface";
 import { DeliveryMethod } from "@/shared/types/order.interface";
 
@@ -85,7 +85,9 @@ export default function CheckoutPage() {
     setLoading(true);
     try {
       const data = await getUserCart();
-      setCart(data);
+      if (data) {
+        setCart(data);
+      }
     } catch (error) {
       console.error("Failed to fetch cart:", error);
     } finally {
@@ -103,10 +105,15 @@ export default function CheckoutPage() {
         orderAmount: subtotalPrice,
       });
 
-      if (result.valid) {
-        setAppliedPromocode(result);
+      if (result) {
+        if (result.valid) {
+          setAppliedPromocode(result);
+        } else {
+          alert(result.message || "Invalid promocode");
+          setAppliedPromocode(null);
+        }
       } else {
-        alert(result.message || "Invalid promocode");
+        alert("Failed to validate promocode");
         setAppliedPromocode(null);
       }
     } catch (error) {
@@ -148,6 +155,10 @@ export default function CheckoutPage() {
         },
       });
 
+      if (!order) {
+        throw new Error("Failed to create order");
+      }
+
       const paymentResponse = await createPayment({
         orderId: order.id,
         provider: "stripe",
@@ -161,6 +172,10 @@ export default function CheckoutPage() {
           method: deliveryMethod,
         },
       });
+
+      if (!paymentResponse) {
+        throw new Error("Failed to create payment");
+      }
 
       window.location.href = paymentResponse.url;
     } catch (error) {

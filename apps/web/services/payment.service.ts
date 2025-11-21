@@ -25,8 +25,8 @@ export interface IPaymentResponse {
 
 export async function createPayment(
   data: ICreatePaymentDto
-): Promise<IPaymentResponse> {
-  return apiFetch(API_URL.payment(), {
+): Promise<IPaymentResponse | null> {
+  return apiFetch<IPaymentResponse>(API_URL.payment(), {
     method: "POST",
     body: JSON.stringify(data),
   });

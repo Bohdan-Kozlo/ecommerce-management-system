@@ -1,6 +1,12 @@
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { BarChart3, TrendingUp, Package } from "lucide-react";
+import {
+  BarChart3,
+  TrendingUp,
+  Package,
+  PackageSearch,
+  Apple,
+} from "lucide-react";
 
 export default function AdminPage() {
   return (
@@ -56,6 +62,38 @@ export default function AdminPage() {
             <CardContent>
               <p className="text-sm text-muted-foreground">
                 Discover best-selling products and trends
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/admin/orders">
+          <Card className="hover:border-primary transition-colors cursor-pointer">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-lg font-semibold">
+                Manage Orders
+              </CardTitle>
+              <PackageSearch className="h-5 w-5 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Manage and track customer orders
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/admin/orders">
+          <Card className="hover:border-primary transition-colors cursor-pointer">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-lg font-semibold">
+                Manage Products
+              </CardTitle>
+              <Apple className="h-5 w-5 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Manage and track your product listings
               </p>
             </CardContent>
           </Card>

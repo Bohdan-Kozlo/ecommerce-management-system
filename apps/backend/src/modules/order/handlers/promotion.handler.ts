@@ -1,13 +1,13 @@
-import {
-  BadRequestException,
-  InternalServerErrorException,
-  NotFoundException,
-} from '@nestjs/common';
-import { Promocode } from '@prisma/client';
+import { InternalServerErrorException } from '@nestjs/common';
 import { OrderProcessingContext, OrderItemCalculation } from './order-processing.types';
 import { OrderProcessingHandler } from './order-processing.handler';
+import { DiscountService } from '../../discount/discount.service';
 
 export class PromotionHandler extends OrderProcessingHandler {
+  constructor(private discountService: DiscountService) {
+    super();
+  }
+
   protected async process(context: OrderProcessingContext): Promise<OrderProcessingContext> {
     if (!context.pricedItems) {
       throw new InternalServerErrorException('Priced items are missing before applying promocode');
@@ -18,17 +18,25 @@ export class PromotionHandler extends OrderProcessingHandler {
     let finalItems = context.pricedItems;
 
     if (context.promocodeCode) {
-      const promocode = await context.prisma.promocode.findUnique({
-        where: { code: context.promocodeCode },
+      const validationResult = await this.discountService.validatePromocode({
+        code: context.promocodeCode,
+        orderAmount: totalAfterDiscounts,
       });
 
-      if (!promocode) {
-        throw new NotFoundException('Promocode not found');
+      if (!validationResult.valid) {
+        throw new InternalServerErrorException(validationResult.message);
       }
 
-      this.validatePromocode(promocode, totalAfterDiscounts);
-      promoDiscount = Math.min(promocode.value, totalAfterDiscounts);
-      context.appliedPromocode = promocode;
+      if (validationResult.promocode && validationResult.discountAmount) {
+        promoDiscount = validationResult.discountAmount;
+        const promocode = await context.prisma.promocode.findUnique({
+          where: { id: validationResult.promocode.id },
+        });
+
+        if (promocode) {
+          context.appliedPromocode = promocode;
+        }
+      }
     }
 
     if (promoDiscount > 0) {
@@ -41,20 +49,6 @@ export class PromotionHandler extends OrderProcessingHandler {
     context.total = totalAfterDiscounts;
 
     return context;
-  }
-
-  private validatePromocode(promocode: Promocode, orderTotal: number) {
-    if (!promocode.isActive) {
-      throw new BadRequestException('Promocode is inactive');
-    }
-
-    if (promocode.usedCount >= promocode.maxUsage) {
-      throw new BadRequestException('Promocode usage limit reached');
-    }
-
-    if (orderTotal < promocode.minOrderAmount) {
-      throw new BadRequestException('Order total does not meet the minimum amount for promocode');
-    }
   }
 
   private applyPromoDiscount(

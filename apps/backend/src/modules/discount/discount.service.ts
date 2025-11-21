@@ -170,7 +170,6 @@ export class DiscountService {
       };
     }
 
-    // Calculate discount amount (assuming value is a percentage)
     const discountAmount = (orderAmount * promocode.value) / 100;
 
     return {

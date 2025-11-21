@@ -26,10 +26,7 @@ import {
   type IOrderAdmin,
   type IOrderItemAdmin,
 } from "@/shared/types/order.interface";
-import {
-  updateOrderStatus,
-  updateDelivery,
-} from "@/services/order/order.service";
+import { updateOrderStatus, updateDelivery } from "@/services/order.service";
 import Image from "next/image";
 
 interface OrderDetailsDialogProps {

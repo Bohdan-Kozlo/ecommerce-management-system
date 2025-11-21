@@ -6,11 +6,13 @@ import type {
   IUpdateCartItemQuantityDto,
 } from "@/shared/types/cart.interface";
 
-export async function getUserCart(): Promise<ICart> {
+export async function getUserCart(): Promise<ICart | null> {
   return apiFetch<ICart>(API_URL.cart(), { method: "GET" });
 }
 
-export async function addItemToCart(dto: IAddCartItemDto): Promise<ICart> {
+export async function addItemToCart(
+  dto: IAddCartItemDto
+): Promise<ICart | null> {
   return apiFetch<ICart>(API_URL.cart("items"), {
     method: "POST",
     body: JSON.stringify(dto),
@@ -19,20 +21,22 @@ export async function addItemToCart(dto: IAddCartItemDto): Promise<ICart> {
 
 export async function updateCartItemQuantity(
   dto: IUpdateCartItemQuantityDto
-): Promise<ICart> {
+): Promise<ICart | null> {
   return apiFetch<ICart>(API_URL.cart("items"), {
     method: "PUT",
     body: JSON.stringify(dto),
   });
 }
 
-export async function removeItemFromCart(productId: string): Promise<ICart> {
+export async function removeItemFromCart(
+  productId: string
+): Promise<ICart | null> {
   return apiFetch<ICart>(API_URL.cart(`items/${productId}`), {
     method: "DELETE",
   });
 }
 
-export async function cleanCart(): Promise<{ message: string }> {
+export async function cleanCart(): Promise<{ message: string } | null> {
   return apiFetch<{ message: string }>(API_URL.cart(), {
     method: "DELETE",
   });

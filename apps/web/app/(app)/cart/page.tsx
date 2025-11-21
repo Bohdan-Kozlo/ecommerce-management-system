@@ -19,7 +19,7 @@ import {
   updateCartItemQuantity,
   removeItemFromCart,
   cleanCart,
-} from "@/services/cart/cart.service";
+} from "@/services/cart.service";
 import type { ICart, ICartItem } from "@/shared/types/cart.interface";
 
 type OptimisticAction =
@@ -76,7 +76,9 @@ export default function CartPage() {
     setLoading(true);
     try {
       const data = await getUserCart();
-      setCart(data);
+      if (data) {
+        setCart(data);
+      }
     } catch (error) {
       console.error("Failed to fetch cart:", error);
     } finally {

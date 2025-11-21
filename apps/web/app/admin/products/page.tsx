@@ -31,8 +31,8 @@ import {
   deleteProduct,
   type ICreateProductData,
   type IUpdateProductData,
-} from "@/services/product/product.service";
-import { getCategories } from "@/services/category/category.service";
+} from "@/services/product.service";
+import { getCategories } from "@/services/category.service";
 import type { IProduct } from "@/shared/types/product.interface";
 import type { ICategory } from "@/shared/types/category.interface";
 import Image from "next/image";
@@ -67,7 +67,9 @@ export default function AdminProductsPage() {
   const fetchCategories = async () => {
     try {
       const data = await getCategories();
-      setCategories(data);
+      if (data) {
+        setCategories(data);
+      }
     } catch (error) {
       console.error("Failed to fetch categories:", error);
     }
@@ -81,8 +83,10 @@ export default function AdminProductsPage() {
         page,
         limit: 10,
       });
-      setProducts(data.products);
-      setTotalPages(data.totalPages);
+      if (data) {
+        setProducts(data.products);
+        setTotalPages(data.totalPages);
+      }
     } catch (error) {
       console.error("Failed to fetch products:", error);
     } finally {

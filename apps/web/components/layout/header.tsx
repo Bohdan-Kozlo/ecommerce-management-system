@@ -15,7 +15,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { IUser } from "@/shared/types/user.interface";
-import { getCurrentUser } from "@/services/user/user.service";
+import { getCurrentUser } from "@/services/user.service";
 import { apiFetch } from "@/api/api-fetch-client";
 import { API_URL } from "@/config/api.config";
 

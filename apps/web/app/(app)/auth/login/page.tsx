@@ -10,7 +10,7 @@ import { GoogleButton } from "@/components/auth/google-button";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { getGoogleAuthUrl, login } from "@/services/auth/auth.service";
+import { getGoogleAuthUrl, login } from "@/services/auth.service";
 import type { IAuthLoginForm } from "@/shared/types/auth.interface";
 
 type FormState = {

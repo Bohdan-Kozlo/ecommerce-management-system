@@ -34,7 +34,6 @@ export class CartService {
     const cart = await this.findOrCreateCart(userId);
     await this.addItemToExistingCart(cart, productId, quantity);
 
-    // Return updated cart with all relations
     return await this.getUserCart(userId);
   }
 
@@ -48,7 +47,6 @@ export class CartService {
       data: { quantity },
     });
 
-    // Return updated cart with all relations
     return await this.getUserCart(userId);
   }
 
@@ -59,7 +57,6 @@ export class CartService {
       where: { id: cartItem.id },
     });
 
-    // Return updated cart with all relations
     return await this.getUserCart(userId);
   }
 

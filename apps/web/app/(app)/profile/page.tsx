@@ -17,7 +17,7 @@ import {
   getCurrentUser,
   updateCurrentUser,
   type UpdateUserPayload,
-} from "@/services/user/user.service";
+} from "@/services/user.service";
 import type { IUser } from "@/shared/types/user.interface";
 
 export default function UserProfile() {

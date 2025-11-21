@@ -1,5 +1,3 @@
-import Link from "next/link";
-import { BarChart3, TrendingUp, Package } from "lucide-react";
 import AdminHeader from "@/components/layout/adminHeader";
 
 export default function AdminLayout({

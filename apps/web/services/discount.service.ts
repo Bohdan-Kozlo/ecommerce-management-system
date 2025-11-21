@@ -25,9 +25,12 @@ export interface IPromocodeValidationResponse {
 
 export async function validatePromocode(
   data: IValidatePromocodeDto
-): Promise<IPromocodeValidationResponse> {
-  return apiFetch(API_URL.discount("promocodes/validate"), {
-    method: "POST",
-    body: JSON.stringify(data),
-  });
+): Promise<IPromocodeValidationResponse | null> {
+  return apiFetch<IPromocodeValidationResponse>(
+    API_URL.discount("promocodes/validate"),
+    {
+      method: "POST",
+      body: JSON.stringify(data),
+    }
+  );
 }

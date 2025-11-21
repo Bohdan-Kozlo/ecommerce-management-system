@@ -35,54 +35,45 @@ export async function getTopProducts(
   from?: string,
   to?: string,
   limit?: number
-): Promise<TopProduct[]> {
+): Promise<TopProduct[] | null> {
   const params = new URLSearchParams();
   if (from) params.append("from", from);
   if (to) params.append("to", to);
   if (limit) params.append("limit", limit.toString());
 
-  const response = await apiFetch<TopProduct[]>(
+  return apiFetch<TopProduct[]>(
     API_URL.report(`top-products?${params.toString()}`),
     {
       method: "GET",
     }
   );
-
-  return response;
 }
 
 export async function getSalesByCategory(
   from?: string,
   to?: string
-): Promise<SalesByCategory[]> {
+): Promise<SalesByCategory[] | null> {
   const params = new URLSearchParams();
   if (from) params.append("from", from);
   if (to) params.append("to", to);
 
-  const response = await apiFetch<SalesByCategory[]>(
+  return apiFetch<SalesByCategory[]>(
     API_URL.report(`sales-by-category?${params.toString()}`),
     {
       method: "GET",
     }
   );
-
-  return response;
 }
 
 export async function getRevenue(
   from?: string,
   to?: string
-): Promise<RevenueData> {
+): Promise<RevenueData | null> {
   const params = new URLSearchParams();
   if (from) params.append("from", from);
   if (to) params.append("to", to);
 
-  const response = await apiFetch<RevenueData>(
-    API_URL.report(`revenue?${params.toString()}`),
-    {
-      method: "GET",
-    }
-  );
-
-  return response;
+  return apiFetch<RevenueData>(API_URL.report(`revenue?${params.toString()}`), {
+    method: "GET",
+  });
 }

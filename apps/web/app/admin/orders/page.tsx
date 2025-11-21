@@ -32,7 +32,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { OrderDetailsDialog } from "@/components/admin/order-details-dialog";
-import { getAllOrders, cancelOrder } from "@/services/order/order.service";
+import { getAllOrders, cancelOrder } from "@/services/order.service";
 import { OrderStatus, type IOrderAdmin } from "@/shared/types/order.interface";
 
 export default function AdminOrdersPage() {
@@ -65,9 +65,11 @@ export default function AdminOrdersPage() {
         params.status = statusFilter;
       }
       const response = await getAllOrders(params);
-      setOrders(response.orders);
-      setTotal(response.total);
-      setTotalPages(response.totalPages);
+      if (response) {
+        setOrders(response.orders);
+        setTotal(response.total);
+        setTotalPages(response.totalPages);
+      }
     } catch (error) {
       console.error("Failed to fetch orders:", error);
     } finally {

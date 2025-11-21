@@ -21,7 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { getUserOrderById } from "@/services/order/order.service";
+import { getUserOrderById } from "@/services/order.service";
 import type { IOrder } from "@/shared/types/order.interface";
 import { OrderStatus, DeliveryMethod } from "@/shared/types/order.interface";
 

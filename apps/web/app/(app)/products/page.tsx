@@ -16,8 +16,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { getProducts } from "@/services/product/product.service";
-import { getCategories } from "@/services/category/category.service";
+import { getProducts } from "@/services/product.service";
+import { getCategories } from "@/services/category.service";
 import type {
   IProduct,
   IProductFilters,
@@ -59,7 +59,9 @@ export default function ProductsPage() {
   async function fetchCategories() {
     try {
       const data = await getCategories();
-      setCategories(data);
+      if (data) {
+        setCategories(data);
+      }
     } catch (error) {
       console.error("Failed to fetch categories:", error);
     }
@@ -84,10 +86,12 @@ export default function ProductsPage() {
       };
 
       const data = await getProducts(filters);
-      setProducts(data.products);
-      setTotalPages(data.totalPages);
-      setTotal(data.total);
-      setPage(data.page);
+      if (data) {
+        setProducts(data.products);
+        setTotalPages(data.totalPages);
+        setTotal(data.total);
+        setPage(data.page);
+      }
     } catch (error) {
       console.error("Failed to fetch products:", error);
     } finally {

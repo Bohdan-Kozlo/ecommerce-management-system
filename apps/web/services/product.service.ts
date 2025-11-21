@@ -8,7 +8,7 @@ import type {
 
 export async function getProducts(
   filters?: IProductFilters
-): Promise<IProductsResponse> {
+): Promise<IProductsResponse | null> {
   const params = new URLSearchParams();
 
   if (filters?.search) params.append("search", filters.search);
@@ -27,7 +27,7 @@ export async function getProducts(
   return apiFetch<IProductsResponse>(url, { method: "GET" });
 }
 
-export async function getProductById(id: string): Promise<IProduct> {
+export async function getProductById(id: string): Promise<IProduct | null> {
   return apiFetch<IProduct>(API_URL.product(id), { method: "GET" });
 }
 
@@ -52,7 +52,7 @@ export interface IUpdateProductData {
 
 export async function createProduct(
   data: ICreateProductData
-): Promise<IProduct> {
+): Promise<IProduct | null> {
   const formData = new FormData();
 
   formData.append("name", data.name);
@@ -77,7 +77,7 @@ export async function createProduct(
 export async function updateProduct(
   id: string,
   data: IUpdateProductData
-): Promise<IProduct> {
+): Promise<IProduct | null> {
   const formData = new FormData();
 
   if (data.name) formData.append("name", data.name);
@@ -109,7 +109,7 @@ export async function updateProduct(
 
 export async function deleteProduct(
   id: string
-): Promise<{ productId: string }> {
+): Promise<{ productId: string } | null> {
   return apiFetch<{ productId: string }>(API_URL.product(id), {
     method: "DELETE",
   });

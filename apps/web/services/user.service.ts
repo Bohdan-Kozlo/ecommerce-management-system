@@ -8,7 +8,7 @@ export interface UpdateUserPayload {
   address?: string;
 }
 
-export async function getCurrentUser(): Promise<IUser> {
+export async function getCurrentUser(): Promise<IUser | null> {
   return apiFetch<IUser>("/users/me", {
     method: "GET",
   });
@@ -16,7 +16,7 @@ export async function getCurrentUser(): Promise<IUser> {
 
 export async function updateCurrentUser(
   payload: UpdateUserPayload
-): Promise<IUser> {
+): Promise<IUser | null> {
   return apiFetch<IUser>("/users/me", {
     method: "PATCH",
     body: JSON.stringify(payload),

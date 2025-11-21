@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { getRevenue, RevenueData } from "@/services/report/report.service";
+import { getRevenue, RevenueData } from "@/services/report.service";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartConfig,

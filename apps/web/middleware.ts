@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { jwtVerify } from "jose";
-import { EnumTokens } from "./services/auth/auth-token.service";
+
+export enum EnumTokens {
+  ACCESS_TOKEN = "accessToken",
+  REFRESH_TOKEN = "refreshToken",
+}
 
 const JWT_SECRET = process.env.JWT_SECRET;
 const LOGIN_URL = "/auth/login";

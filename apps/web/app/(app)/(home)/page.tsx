@@ -72,7 +72,7 @@ export default function Home() {
               </Link>
             </Button>
             <Link
-              href="/catalog"
+              href="/products"
               className={cn(
                 buttonVariants({ variant: "outline" }),
                 "w-full sm:w-auto"

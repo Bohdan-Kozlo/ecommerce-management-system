@@ -12,10 +12,14 @@ import { OrderBuilder } from './builder/order.builder';
 import { OrderDirector } from './builder/order.director';
 import { ChangeStatusOrderDto } from './dto/change-status-order.dto';
 import { UpdateDeliveryDto } from './dto/update-delivery.dto';
+import { DiscountService } from '../discount/discount.service';
 
 @Injectable()
 export class OrderService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private discountService: DiscountService,
+  ) {}
 
   async createOrderFromCart(userId: string, dto: CreateOrderDto) {
     return this.prisma.$transaction(async (tx) => {
@@ -322,7 +326,7 @@ export class OrderService {
     const cartValidation = new CartValidationHandler();
     const stockValidation = new StockValidationHandler();
     const discount = new DiscountHandler();
-    const promotion = new PromotionHandler();
+    const promotion = new PromotionHandler(this.discountService);
     const reservation = new ReservationHandler();
 
     cartValidation

@@ -8,8 +8,8 @@ import { ArrowLeft, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { getProductById } from "@/services/product/product.service";
-import { addItemToCart } from "@/services/cart/cart.service";
+import { getProductById } from "@/services/product.service";
+import { addItemToCart } from "@/services/cart.service";
 import type { IProduct } from "@/shared/types/product.interface";
 
 export default function ProductDetailPage({
