@@ -6,6 +6,7 @@ import {
   Package,
   PackageSearch,
   Apple,
+  Percent,
 } from "lucide-react";
 
 export default function AdminPage() {
@@ -94,6 +95,22 @@ export default function AdminPage() {
             <CardContent>
               <p className="text-sm text-muted-foreground">
                 Manage and track your product listings
+              </p>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link href="/admin/discounts">
+          <Card className="hover:border-primary transition-colors cursor-pointer">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-lg font-semibold">
+                Manage Discounts and Promocodes
+              </CardTitle>
+              <Percent className="h-5 w-5 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">
+                Manage and track your discounts and promocodes
               </p>
             </CardContent>
           </Card>

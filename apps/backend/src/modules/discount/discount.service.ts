@@ -121,6 +121,38 @@ export class DiscountService {
     return promocode;
   }
 
+  async getAllDiscounts() {
+    return this.prisma.discount.findMany({
+      include: {
+        product: {
+          include: {
+            productImages: true,
+          },
+        },
+      },
+      orderBy: { startDate: 'desc' },
+    });
+  }
+
+  async getDiscountById(id: string) {
+    const discount = await this.prisma.discount.findUnique({
+      where: { id },
+      include: {
+        product: {
+          include: {
+            productImages: true,
+          },
+        },
+      },
+    });
+
+    if (!discount) {
+      throw new NotFoundException(`Discount with ID ${id} not found`);
+    }
+
+    return discount;
+  }
+
   async deletePromocode(id: string) {
     const promocode = await this.prisma.promocode.findUnique({
       where: { id },
@@ -132,6 +164,39 @@ export class DiscountService {
 
     return this.prisma.promocode.delete({
       where: { id },
+    });
+  }
+
+  async getAllPromocodes() {
+    return this.prisma.promocode.findMany({
+      orderBy: { usedCount: 'desc' },
+    });
+  }
+
+  async getPromocodeById(id: string) {
+    const promocode = await this.prisma.promocode.findUnique({
+      where: { id },
+    });
+
+    if (!promocode) {
+      throw new NotFoundException(`Promocode with ID ${id} not found`);
+    }
+
+    return promocode;
+  }
+
+  async updatePromocode(id: string, updateData: Partial<CreatePromocodeDto>) {
+    const promocode = await this.prisma.promocode.findUnique({
+      where: { id },
+    });
+
+    if (!promocode) {
+      throw new NotFoundException(`Promocode with ID ${id} not found`);
+    }
+
+    return this.prisma.promocode.update({
+      where: { id },
+      data: updateData,
     });
   }
 

@@ -3,6 +3,7 @@ import {
   BarChart3,
   Package,
   PackageSearch,
+  Percent,
   TrendingUp,
 } from "lucide-react";
 import Link from "next/link";
@@ -51,6 +52,13 @@ export default function AdminHeader() {
               >
                 <PackageSearch className="h-4 w-4" />
                 Manage Orders
+              </Link>
+              <Link
+                href="/admin/discounts"
+                className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+              >
+                <Percent className="h-4 w-4" />
+                Manage Discounts
               </Link>
             </nav>
           </div>

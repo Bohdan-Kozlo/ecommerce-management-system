@@ -37,7 +37,9 @@ export default function OrdersPage() {
     setLoading(true);
     try {
       const data = await getUserOrders();
-      setOrders(data);
+      if (data) {
+        return setOrders(data);
+      }
     } catch (error) {
       console.error("Failed to fetch orders:", error);
     } finally {
