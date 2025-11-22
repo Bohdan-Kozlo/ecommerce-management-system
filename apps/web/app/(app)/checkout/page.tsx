@@ -186,8 +186,21 @@ export default function CheckoutPage() {
   }
 
   const cartItems = cart?.cartItems || [];
+
+  const calculateItemPrice = (item: (typeof cartItems)[0]) => {
+    const product = item.product;
+    if (
+      product?.discount &&
+      product.discount.length > 0 &&
+      product.discount[0]
+    ) {
+      return product.price * (1 - product.discount[0].value / 100);
+    }
+    return product?.price || 0;
+  };
+
   const subtotalPrice = cartItems.reduce(
-    (sum, item) => sum + (item.product?.price || 0) * item.quantity,
+    (sum, item) => sum + calculateItemPrice(item) * item.quantity,
     0
   );
   const discountAmount = appliedPromocode?.discountAmount || 0;
@@ -366,7 +379,7 @@ export default function CheckoutPage() {
                     return (
                       <div key={item.id} className="flex gap-3">
                         <div className="relative w-16 h-16 shrink-0 bg-muted rounded overflow-hidden">
-                          {hasImage && item.product.productImages[0] ? (
+                          {hasImage && item.product.productImages?.[0] ? (
                             <Image
                               src={item.product.productImages[0].url}
                               alt={item.product.name}
@@ -386,9 +399,28 @@ export default function CheckoutPage() {
                           <p className="text-xs text-muted-foreground">
                             Qty: {item.quantity}
                           </p>
-                          <p className="text-sm font-semibold">
-                            ${(item.product.price * item.quantity).toFixed(2)}
-                          </p>
+                          {item.product.discount &&
+                          item.product.discount.length > 0 &&
+                          item.product.discount[0] ? (
+                            <>
+                              <p className="text-sm font-semibold text-red-600">
+                                $
+                                {(
+                                  calculateItemPrice(item) * item.quantity
+                                ).toFixed(2)}
+                              </p>
+                              <p className="text-xs text-muted-foreground line-through">
+                                $
+                                {(item.product.price * item.quantity).toFixed(
+                                  2
+                                )}
+                              </p>
+                            </>
+                          ) : (
+                            <p className="text-sm font-semibold">
+                              ${(item.product.price * item.quantity).toFixed(2)}
+                            </p>
+                          )}
                         </div>
                       </div>
                     );
@@ -429,7 +461,7 @@ export default function CheckoutPage() {
                           placeholder="Enter code"
                           value={promocode}
                           onChange={(e) =>
-                            setPromocode(e.target.value.toUpperCase())
+                            setPromocode(e.target.value.toLowerCase())
                           }
                           onKeyDown={(e) => {
                             if (e.key === "Enter") {

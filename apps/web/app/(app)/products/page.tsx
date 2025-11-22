@@ -367,6 +367,16 @@ export default function ProductsPage() {
                       No image
                     </div>
                   )}
+                  {product.discount &&
+                    product.discount.length > 0 &&
+                    product.discount[0] && (
+                      <Badge
+                        variant="destructive"
+                        className="absolute top-2 left-2 bg-red-600"
+                      >
+                        -{product.discount[0].value}%
+                      </Badge>
+                    )}
                   {product.stock === 0 && (
                     <Badge
                       variant="destructive"
@@ -391,9 +401,28 @@ export default function ProductsPage() {
                     </p>
                   )}
                   <div className="flex items-center justify-between">
-                    <p className="text-lg font-bold">
-                      ${product.price.toFixed(2)}
-                    </p>
+                    <div className="flex flex-col">
+                      {product.discount &&
+                      product.discount.length > 0 &&
+                      product.discount[0] ? (
+                        <>
+                          <p className="text-lg font-bold text-red-600">
+                            $
+                            {(
+                              product.price *
+                              (1 - product.discount[0].value / 100)
+                            ).toFixed(2)}
+                          </p>
+                          <p className="text-sm text-muted-foreground line-through">
+                            ${product.price.toFixed(2)}
+                          </p>
+                        </>
+                      ) : (
+                        <p className="text-lg font-bold">
+                          ${product.price.toFixed(2)}
+                        </p>
+                      )}
+                    </div>
                     {product.stock > 0 && (
                       <Badge variant="secondary">
                         {product.stock} in stock

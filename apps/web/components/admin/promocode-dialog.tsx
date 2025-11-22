@@ -115,9 +115,12 @@ export function PromocodeDialog({
               min="0"
               max="100"
               step="0.01"
-              value={formData.value}
+              value={formData.value || ""}
               onChange={(e) =>
-                setFormData({ ...formData, value: parseFloat(e.target.value) })
+                setFormData({
+                  ...formData,
+                  value: parseFloat(e.target.value) || 0,
+                })
               }
               required
             />
@@ -130,11 +133,11 @@ export function PromocodeDialog({
               type="number"
               min="0"
               step="0.01"
-              value={formData.minOrderAmount}
+              value={formData.minOrderAmount || ""}
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  minOrderAmount: parseFloat(e.target.value),
+                  minOrderAmount: parseFloat(e.target.value) || 0,
                 })
               }
               required
@@ -147,11 +150,11 @@ export function PromocodeDialog({
               id="maxUsage"
               type="number"
               min="1"
-              value={formData.maxUsage}
+              value={formData.maxUsage || ""}
               onChange={(e) =>
                 setFormData({
                   ...formData,
-                  maxUsage: parseInt(e.target.value),
+                  maxUsage: parseInt(e.target.value) || 1,
                 })
               }
               required

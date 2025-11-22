@@ -11,7 +11,6 @@ import { AdminGuard } from 'src/common/guards/admin.guard';
 export class DiscountController {
   constructor(private discountService: DiscountService) {}
 
-  // Promocode routes (must be before :id routes to avoid conflicts)
   @Get('promocodes')
   @UseGuards(AccessJwtGuard, AdminGuard)
   getAllPromocodes() {

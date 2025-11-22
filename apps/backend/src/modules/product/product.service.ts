@@ -53,7 +53,17 @@ export class ProductService {
   async findById(id: string) {
     const product = await this.prisma.product.findUnique({
       where: { id },
-      include: { productImages: true, Category: true },
+      include: {
+        productImages: true,
+        Category: true,
+        discount: {
+          where: {
+            isActive: true,
+            startDate: { lte: new Date() },
+            endDate: { gte: new Date() },
+          },
+        },
+      },
     });
 
     if (!product) {
@@ -103,7 +113,17 @@ export class ProductService {
         orderBy,
         skip,
         take: limit,
-        include: { productImages: true, Category: true },
+        include: {
+          productImages: true,
+          Category: true,
+          discount: {
+            where: {
+              isActive: true,
+              startDate: { lte: new Date() },
+              endDate: { gte: new Date() },
+            },
+          },
+        },
       }),
       this.prisma.product.count({ where }),
     ]);

@@ -140,9 +140,12 @@ export function DiscountDialog({
               type="number"
               min="0"
               max="100"
-              value={formData.value}
+              value={formData.value || ""}
               onChange={(e) =>
-                setFormData({ ...formData, value: parseFloat(e.target.value) })
+                setFormData({
+                  ...formData,
+                  value: parseFloat(e.target.value) || 0,
+                })
               }
               required
             />

@@ -18,6 +18,13 @@ export class CartService {
               include: {
                 productImages: true,
                 Category: true,
+                discount: {
+                  where: {
+                    isActive: true,
+                    startDate: { lte: new Date() },
+                    endDate: { gte: new Date() },
+                  },
+                },
               },
             },
           },

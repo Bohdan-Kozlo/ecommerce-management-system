@@ -203,7 +203,7 @@ export class DiscountService {
   async validatePromocode(validatePromocodeDto: ValidatePromocodeDto) {
     const { code, orderAmount } = validatePromocodeDto;
 
-    const promocode = await this.prisma.promocode.findUnique({
+    const promocode = await this.prisma.promocode.findFirst({
       where: { code },
     });
 

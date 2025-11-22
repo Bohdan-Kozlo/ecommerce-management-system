@@ -10,6 +10,15 @@ export interface ICategory {
   description?: string;
 }
 
+export interface IDiscount {
+  id: string;
+  value: number;
+  startDate: string;
+  endDate: string;
+  isActive: boolean;
+  productId: string;
+}
+
 export interface IProduct {
   id: string;
   name: string;
@@ -18,7 +27,8 @@ export interface IProduct {
   stock: number;
   categoryId?: string;
   Category?: ICategory;
-  productImages: IProductImage[];
+  productImages?: IProductImage[];
+  discount?: IDiscount[];
   createdAt: string;
   updatedAt: string;
 }

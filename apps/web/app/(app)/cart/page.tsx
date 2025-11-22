@@ -165,8 +165,21 @@ export default function CartPage() {
 
   const displayCart = optimisticCart || cart;
   const cartItems = displayCart?.cartItems || [];
+
+  const calculateItemPrice = (item: ICartItem) => {
+    const product = item.product;
+    if (
+      product?.discount &&
+      product.discount.length > 0 &&
+      product.discount[0]
+    ) {
+      return product.price * (1 - product.discount[0].value / 100);
+    }
+    return product?.price || 0;
+  };
+
   const subtotalPrice = cartItems.reduce(
-    (sum, item) => sum + (item.product?.price || 0) * item.quantity,
+    (sum, item) => sum + calculateItemPrice(item) * item.quantity,
     0
   );
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
@@ -290,7 +303,7 @@ function CartItemCard({ item, onUpdateQuantity, onRemove }: CartItemCardProps) {
             className="relative w-24 h-24 shrink-0 bg-muted rounded-md overflow-hidden cursor-pointer"
             onClick={() => (window.location.href = `/products/${product.id}`)}
           >
-            {hasImage && product.productImages[0] ? (
+            {hasImage && product.productImages?.[0] ? (
               <Image
                 src={product.productImages[0].url}
                 alt={product.name}
@@ -380,10 +393,43 @@ function CartItemCard({ item, onUpdateQuantity, onRemove }: CartItemCardProps) {
 
               {/* Price */}
               <div className="text-right">
-                <p className="text-sm text-muted-foreground">
-                  ${product.price.toFixed(2)} each
-                </p>
-                <p className="text-lg font-bold">${subtotal.toFixed(2)}</p>
+                {product.discount &&
+                product.discount.length > 0 &&
+                product.discount[0] ? (
+                  <>
+                    <div className="flex items-center gap-2 justify-end">
+                      <p className="text-sm text-red-600 font-semibold">
+                        $
+                        {(
+                          product.price *
+                          (1 - product.discount[0].value / 100)
+                        ).toFixed(2)}{" "}
+                        each
+                      </p>
+                      <span className="text-xs bg-red-600 text-white px-1.5 py-0.5 rounded">
+                        -{product.discount[0].value}%
+                      </span>
+                    </div>
+                    <p className="text-xs text-muted-foreground line-through">
+                      ${product.price.toFixed(2)}
+                    </p>
+                    <p className="text-lg font-bold text-red-600">
+                      $
+                      {(
+                        product.price *
+                        (1 - product.discount[0].value / 100) *
+                        quantity
+                      ).toFixed(2)}
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-sm text-muted-foreground">
+                      ${product.price.toFixed(2)} each
+                    </p>
+                    <p className="text-lg font-bold">${subtotal.toFixed(2)}</p>
+                  </>
+                )}
               </div>
             </div>
 
