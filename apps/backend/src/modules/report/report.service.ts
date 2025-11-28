@@ -75,10 +75,10 @@ export class ReportService {
           SELECT 
             c.id as "categoryId",
             c.name as "categoryName",
-            COALESCE(SUM(oi.price * oi.quantity), 0) as "totalRevenue",
-            COALESCE(SUM(oi.quantity), 0)::bigint as "totalItemsSold",
+            COALESCE(SUM(CASE WHEN o.id IS NOT NULL THEN oi.price * oi.quantity ELSE 0 END), 0) as "totalRevenue",
+            COALESCE(SUM(CASE WHEN o.id IS NOT NULL THEN oi.quantity ELSE 0 END), 0)::bigint as "totalItemsSold",
             COUNT(DISTINCT CASE WHEN o.id IS NOT NULL THEN o.id END)::bigint as "totalOrders",
-            COALESCE(AVG(oi.price * oi.quantity), 0) as "averageOrderValue"
+            COALESCE(AVG(CASE WHEN o.id IS NOT NULL THEN oi.price * oi.quantity ELSE NULL END), 0) as "averageOrderValue"
           FROM categories c
           LEFT JOIN products p ON p."categoryId" = c.id
           LEFT JOIN order_items oi ON oi."productId" = p.id
@@ -114,15 +114,14 @@ export class ReportService {
         {
           totalRevenue: number;
           totalOrders: bigint;
-          averageOrderValue: number;
         }[]
       >(
         Prisma.sql`
           SELECT 
-            SUM(o."totalAmount") as "totalRevenue",
-            COUNT(o.id)::bigint as "totalOrders",
-            AVG(o."totalAmount") as "averageOrderValue"
+            COALESCE(SUM(oi.price * oi.quantity), 0) as "totalRevenue",
+            COUNT(DISTINCT o.id)::bigint as "totalOrders"
           FROM orders o
+          JOIN order_items oi ON o.id = oi."orderId"
           WHERE o.status IN ('PAID', 'SHIPPED', 'DELIVERED')
             AND o."createdAt" >= ${fromDate}
             AND o."createdAt" <= ${toDate}
@@ -139,9 +138,10 @@ export class ReportService {
         Prisma.sql`
           SELECT 
             DATE(o."createdAt") as "date",
-            SUM(o."totalAmount") as "revenue",
-            COUNT(o.id)::bigint as "ordersCount"
+            COALESCE(SUM(oi.price * oi.quantity), 0) as "revenue",
+            COUNT(DISTINCT o.id)::bigint as "ordersCount"
           FROM orders o
+          JOIN order_items oi ON o.id = oi."orderId"
           WHERE o.status IN ('PAID', 'SHIPPED', 'DELIVERED')
             AND o."createdAt" >= ${fromDate}
             AND o."createdAt" <= ${toDate}
@@ -151,11 +151,14 @@ export class ReportService {
       );
 
       const stats = totalStats[0];
+      const totalRevenue = Number(stats?.totalRevenue || 0);
+      const totalOrders = Number(stats?.totalOrders || 0);
+      const averageOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
       return {
-        totalRevenue: Number(stats?.totalRevenue || 0),
-        totalOrders: Number(stats?.totalOrders || 0),
-        averageOrderValue: Number(stats?.averageOrderValue || 0),
+        totalRevenue,
+        totalOrders,
+        averageOrderValue,
         revenueByDate: revenueByDate.map((item) => ({
           date: item.date.toISOString().split('T')[0],
           revenue: Number(item.revenue),
