@@ -1,12 +1,11 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { ReportService } from './report.service';
 import { ReportPeriodDto } from './dto/report-period.dto';
 import { TopProductsDto } from './dto/top-products.dto';
-import { AdminGuard } from 'src/common/guards/admin.guard';
-import { AccessJwtGuard } from 'src/common/guards/acessJwt.guard';
+import { AdminAuth } from 'src/common/decorators/auth.decorator';
 
 @Controller('reports')
-@UseGuards(AccessJwtGuard, AdminGuard)
+@AdminAuth()
 export class ReportController {
   constructor(private reportService: ReportService) {}
 

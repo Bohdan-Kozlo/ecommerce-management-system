@@ -7,7 +7,6 @@ import {
   Body,
   Param,
   Query,
-  UseGuards,
   UseInterceptors,
   UploadedFiles,
 } from '@nestjs/common';
@@ -16,8 +15,7 @@ import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { QueryProductsDto } from './dto/query-products.dto';
-import { AccessJwtGuard } from 'src/common/guards/acessJwt.guard';
-import { AdminGuard } from 'src/common/guards/admin.guard';
+import { AdminAuth } from 'src/common/decorators/auth.decorator';
 import { imageFileFilter, fileSizeLimit } from 'src/common/utils/file-upload.utils';
 
 @Controller('products')
@@ -35,7 +33,7 @@ export class ProductController {
   }
 
   @Post()
-  @UseGuards(AccessJwtGuard, AdminGuard)
+  @AdminAuth()
   @UseInterceptors(
     FilesInterceptor('images', 10, {
       fileFilter: imageFileFilter,
@@ -50,7 +48,7 @@ export class ProductController {
   }
 
   @Patch(':id')
-  @UseGuards(AccessJwtGuard, AdminGuard)
+  @AdminAuth()
   @UseInterceptors(
     FilesInterceptor('images', 10, {
       fileFilter: imageFileFilter,
@@ -66,7 +64,7 @@ export class ProductController {
   }
 
   @Delete(':id')
-  @UseGuards(AccessJwtGuard, AdminGuard)
+  @AdminAuth()
   delete(@Param('id') id: string) {
     return this.productService.delete(id);
   }

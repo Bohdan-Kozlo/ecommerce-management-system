@@ -1,6 +1,6 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Post, Req } from '@nestjs/common';
 import { PaymentService } from './payment.service';
-import { AccessJwtGuard } from 'src/common/guards/acessJwt.guard';
+import { Auth } from 'src/common/decorators/auth.decorator';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import type { AuthUser } from 'src/common/types/types';
 import { CreatePaymentDto } from './dto/create-payment.dto';
@@ -10,7 +10,7 @@ import type { Request } from 'express';
 export class PaymentController {
   constructor(private paymentService: PaymentService) {}
 
-  @UseGuards(AccessJwtGuard)
+  @Auth()
   @Post()
   createPayment(@CurrentUser() user: AuthUser, @Body() createPaymentDto: CreatePaymentDto) {
     return this.paymentService.createPayment(createPaymentDto, user.userId);

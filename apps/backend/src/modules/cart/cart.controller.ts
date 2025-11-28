@@ -1,13 +1,13 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { AddCartItemDto } from './dto/add-cart-item.dto';
 import { UpdateCartItemQuantity } from './dto/update-cart-item.dto';
-import { AccessJwtGuard } from 'src/common/guards/acessJwt.guard';
+import { Auth } from 'src/common/decorators/auth.decorator';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import type { AuthUser } from 'src/common/types/types';
 
 @Controller('cart')
-@UseGuards(AccessJwtGuard)
+@Auth()
 export class CartController {
   constructor(private readonly cartService: CartService) {}
 

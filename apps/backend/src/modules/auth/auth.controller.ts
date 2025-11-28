@@ -3,7 +3,7 @@ import { AuthService } from './auth.service';
 import { LocalGuard } from 'src/common/guards/local.guard';
 import { GoogleGuard } from 'src/common/guards/google.guard';
 import { RefreshJwtGuard } from 'src/common/guards/refreshJwt.guard';
-import { AccessJwtGuard } from 'src/common/guards/acessJwt.guard';
+import { Auth } from 'src/common/decorators/auth.decorator';
 import type { AuthRequest, GoogleAuthRequest, JwtAuthRequest } from 'src/common/types/types';
 import { RegisterDto } from './dto/register.dto';
 import type { Response } from 'express';
@@ -75,7 +75,7 @@ export class AuthController {
     };
   }
 
-  @UseGuards(AccessJwtGuard)
+  @Auth()
   @Post('logout')
   async logout(@Request() req: JwtAuthRequest, @Res({ passthrough: true }) res: Response) {
     await this.authService.logout(req.user.userId);

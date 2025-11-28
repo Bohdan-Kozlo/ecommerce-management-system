@@ -1,9 +1,8 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
-import { AccessJwtGuard } from 'src/common/guards/acessJwt.guard';
-import { AdminGuard } from 'src/common/guards/admin.guard';
+import { AdminAuth } from 'src/common/decorators/auth.decorator';
 
 @Controller('categories')
 export class CategoryController {
@@ -20,19 +19,19 @@ export class CategoryController {
   }
 
   @Post()
-  @UseGuards(AccessJwtGuard, AdminGuard)
+  @AdminAuth()
   create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoryService.create(createCategoryDto);
   }
 
   @Patch(':id')
-  @UseGuards(AccessJwtGuard, AdminGuard)
+  @AdminAuth()
   update(@Param('id') id: string, @Body() updateCategoryDto: UpdateCategoryDto) {
     return this.categoryService.update(id, updateCategoryDto);
   }
 
   @Delete(':id')
-  @UseGuards(AccessJwtGuard, AdminGuard)
+  @AdminAuth()
   delete(@Param('id') id: string) {
     return this.categoryService.delete(id);
   }

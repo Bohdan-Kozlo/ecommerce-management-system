@@ -13,10 +13,9 @@ import * as bcrypt from 'bcrypt';
 const prisma = new PrismaClient();
 
 async function main() {
-  console.log('🌱 Seeding database...');
+  console.log('Seeding database...');
 
-  // Clear existing data
-  console.log('🗑️  Clearing existing data...');
+  console.log('Clearing existing data...');
   await prisma.orderItem.deleteMany();
   await prisma.delivery.deleteMany();
   await prisma.order.deleteMany();
@@ -29,12 +28,10 @@ async function main() {
   await prisma.category.deleteMany();
   await prisma.user.deleteMany();
 
-  // Create users
-  console.log('👥 Creating users...');
+  console.log('Creating users...');
   const users: User[] = [];
   const hashedPassword = await bcrypt.hash('password123', 10);
 
-  // Admin user
   const adminUser = (await prisma.user.create({
     data: {
       email: 'admin@example.com',
@@ -48,7 +45,6 @@ async function main() {
   })) as User;
   users.push(adminUser);
 
-  // Regular users
   for (let i = 0; i < 10; i++) {
     const user = (await prisma.user.create({
       data: {
@@ -63,10 +59,9 @@ async function main() {
     })) as User;
     users.push(user);
   }
-  console.log(`✅ Created ${users.length} users`);
+  console.log(`Created ${users.length} users`);
 
-  // Create categories
-  console.log('📂 Creating categories...');
+  console.log('Creating categories...');
   const categoryNames = [
     'Electronics',
     'Clothing',
@@ -87,10 +82,9 @@ async function main() {
     })) as Category;
     categories.push(category);
   }
-  console.log(`✅ Created ${categories.length} categories`);
+  console.log(`Created ${categories.length} categories`);
 
-  // Create products
-  console.log('🛍️  Creating products...');
+  console.log('Creating products...');
   const products: Product[] = [];
   for (let i = 0; i < 50; i++) {
     const product = (await prisma.product.create({
@@ -104,10 +98,9 @@ async function main() {
     })) as Product;
     products.push(product);
   }
-  console.log(`✅ Created ${products.length} products`);
+  console.log(`Created ${products.length} products`);
 
-  // Create product images
-  console.log('🖼️  Creating product images...');
+  console.log('Creating product images...');
   let imageCount = 0;
   for (const product of products) {
     const numImages = faker.number.int({ min: 1, max: 4 });
@@ -121,10 +114,9 @@ async function main() {
       imageCount++;
     }
   }
-  console.log(`✅ Created ${imageCount} product images`);
+  console.log(`Created ${imageCount} product images`);
 
-  // Create promocodes
-  console.log('🎟️  Creating promocodes...');
+  console.log('Creating promocodes...');
   const promocodes: { id: string; code: string; value: number }[] = [];
   for (let i = 0; i < 5; i++) {
     const promocode = await prisma.promocode.create({
@@ -139,10 +131,9 @@ async function main() {
     });
     promocodes.push(promocode);
   }
-  console.log(`✅ Created ${promocodes.length} promocodes`);
+  console.log(`Created ${promocodes.length} promocodes`);
 
-  // Create discounts
-  console.log('💰 Creating discounts...');
+  console.log('Creating discounts...');
   const discountProducts = faker.helpers.arrayElements(products, 15);
   let discountCount = 0;
   for (const product of discountProducts) {
@@ -157,10 +148,10 @@ async function main() {
     });
     discountCount++;
   }
-  console.log(`✅ Created ${discountCount} discounts`);
+  console.log(`Created ${discountCount} discounts`);
 
   // Create carts
-  console.log('🛒 Creating carts...');
+  console.log('Creating carts...');
   const carts: { id: string; userId: string }[] = [];
   for (const user of users.slice(1, 6)) {
     const cart = await prisma.cart.create({
@@ -170,10 +161,9 @@ async function main() {
     });
     carts.push(cart);
   }
-  console.log(`✅ Created ${carts.length} carts`);
+  console.log(`Created ${carts.length} carts`);
 
-  // Create cart items
-  console.log('📦 Creating cart items...');
+  console.log('Creating cart items...');
   let cartItemCount = 0;
   for (const cart of carts) {
     const numItems = faker.number.int({ min: 1, max: 5 });
@@ -189,10 +179,9 @@ async function main() {
       cartItemCount++;
     }
   }
-  console.log(`✅ Created ${cartItemCount} cart items`);
+  console.log(`Created ${cartItemCount} cart items`);
 
-  // Create orders
-  console.log('📋 Creating orders...');
+  console.log('Creating orders...');
   const orders: { id: string; status: OrderStatus; userId: string; totalAmount: number }[] = [];
   const orderStatuses = [
     OrderStatus.PENDING,
@@ -216,10 +205,9 @@ async function main() {
       orders.push(order);
     }
   }
-  console.log(`✅ Created ${orders.length} orders`);
+  console.log(`Created ${orders.length} orders`);
 
-  // Create order items
-  console.log('📦 Creating order items...');
+  console.log('Creating order items...');
   let orderItemCount = 0;
   for (const order of orders) {
     const numItems = faker.number.int({ min: 1, max: 5 });
@@ -236,10 +224,9 @@ async function main() {
       orderItemCount++;
     }
   }
-  console.log(`✅ Created ${orderItemCount} order items`);
+  console.log(`Created ${orderItemCount} order items`);
 
-  // Create deliveries
-  console.log('🚚 Creating deliveries...');
+  console.log('Creating deliveries...');
   const deliveryMethods = [
     DeliveryMethod.COUIRIER,
     DeliveryMethod.LOCKER,
@@ -258,24 +245,7 @@ async function main() {
     });
     deliveryCount++;
   }
-  console.log(`✅ Created ${deliveryCount} deliveries`);
-
-  console.log('\n🎉 Seeding completed successfully!');
-  console.log('\n📊 Summary:');
-  console.log(`   Users: ${users.length}`);
-  console.log(`   Categories: ${categories.length}`);
-  console.log(`   Products: ${products.length}`);
-  console.log(`   Product Images: ${imageCount}`);
-  console.log(`   Promocodes: ${promocodes.length}`);
-  console.log(`   Discounts: ${discountCount}`);
-  console.log(`   Carts: ${carts.length}`);
-  console.log(`   Cart Items: ${cartItemCount}`);
-  console.log(`   Orders: ${orders.length}`);
-  console.log(`   Order Items: ${orderItemCount}`);
-  console.log(`   Deliveries: ${deliveryCount}`);
-  console.log('\n💡 Test credentials:');
-  console.log('   Email: admin@example.com');
-  console.log('   Password: password123');
+  console.log(`Created ${deliveryCount} deliveries`);
 }
 
 main()

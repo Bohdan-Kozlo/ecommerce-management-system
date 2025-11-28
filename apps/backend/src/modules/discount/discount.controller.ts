@@ -1,36 +1,35 @@
-import { Controller, Post, Patch, Delete, Body, Param, UseGuards, Get } from '@nestjs/common';
+import { Controller, Post, Patch, Delete, Body, Param, Get } from '@nestjs/common';
 import { DiscountService } from './discount.service';
 import { CreateDiscountDto } from './dto/create-discount.dto';
 import { UpdateDiscountDto } from './dto/update-discount.dto';
 import { CreatePromocodeDto } from './dto/create-promocode.dto';
 import { ValidatePromocodeDto } from './dto/validate-promocode.dto';
-import { AccessJwtGuard } from 'src/common/guards/acessJwt.guard';
-import { AdminGuard } from 'src/common/guards/admin.guard';
+import { AdminAuth } from 'src/common/decorators/auth.decorator';
 
 @Controller('discounts')
 export class DiscountController {
   constructor(private discountService: DiscountService) {}
 
   @Get('promocodes')
-  @UseGuards(AccessJwtGuard, AdminGuard)
+  @AdminAuth()
   getAllPromocodes() {
     return this.discountService.getAllPromocodes();
   }
 
   @Get('promocodes/:id')
-  @UseGuards(AccessJwtGuard, AdminGuard)
+  @AdminAuth()
   getPromocodeById(@Param('id') id: string) {
     return this.discountService.getPromocodeById(id);
   }
 
   @Post('promocodes')
-  @UseGuards(AccessJwtGuard, AdminGuard)
+  @AdminAuth()
   createPromocode(@Body() createPromocodeDto: CreatePromocodeDto) {
     return this.discountService.createPromocode(createPromocodeDto);
   }
 
   @Patch('promocodes/:id')
-  @UseGuards(AccessJwtGuard, AdminGuard)
+  @AdminAuth()
   updatePromocode(@Param('id') id: string, @Body() updateData: Partial<CreatePromocodeDto>) {
     return this.discountService.updatePromocode(id, updateData);
   }
@@ -41,37 +40,37 @@ export class DiscountController {
   }
 
   @Delete('promocodes/:id')
-  @UseGuards(AccessJwtGuard, AdminGuard)
+  @AdminAuth()
   deletePromocode(@Param('id') id: string) {
     return this.discountService.deletePromocode(id);
   }
 
   @Get()
-  @UseGuards(AccessJwtGuard, AdminGuard)
+  @AdminAuth()
   getAllDiscounts() {
     return this.discountService.getAllDiscounts();
   }
 
   @Get(':id')
-  @UseGuards(AccessJwtGuard, AdminGuard)
+  @AdminAuth()
   getDiscountById(@Param('id') id: string) {
     return this.discountService.getDiscountById(id);
   }
 
   @Post()
-  @UseGuards(AccessJwtGuard, AdminGuard)
+  @AdminAuth()
   createDiscount(@Body() createDiscountDto: CreateDiscountDto) {
     return this.discountService.createDiscount(createDiscountDto);
   }
 
   @Patch(':id')
-  @UseGuards(AccessJwtGuard, AdminGuard)
+  @AdminAuth()
   updateDiscount(@Param('id') id: string, @Body() updateDiscountDto: UpdateDiscountDto) {
     return this.discountService.updateDiscount(id, updateDiscountDto);
   }
 
   @Delete(':id')
-  @UseGuards(AccessJwtGuard, AdminGuard)
+  @AdminAuth()
   deleteDiscount(@Param('id') id: string) {
     return this.discountService.deleteDiscount(id);
   }
