@@ -1,7 +1,8 @@
-import { BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
 import { OrderProcessingContext } from './order-processing.types';
 import { OrderProcessingHandler } from './order-processing.handler';
 
+@Injectable()
 export class ReservationHandler extends OrderProcessingHandler {
   protected async process(context: OrderProcessingContext): Promise<OrderProcessingContext> {
     if (!context.cart) {

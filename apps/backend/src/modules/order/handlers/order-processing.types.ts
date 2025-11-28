@@ -27,7 +27,6 @@ export interface OrderProcessingContext {
   promocodeCode?: string;
   now: Date;
   cart?: CartWithItems;
-  subtotal?: number;
   total?: number;
   promoDiscount?: number;
   appliedPromocode?: Promocode;

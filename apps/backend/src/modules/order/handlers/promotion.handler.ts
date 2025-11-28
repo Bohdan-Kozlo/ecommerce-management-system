@@ -1,8 +1,10 @@
-import { InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Promocode } from '@prisma/client';
 import { OrderProcessingContext, OrderItemCalculation } from './order-processing.types';
 import { OrderProcessingHandler } from './order-processing.handler';
 import { DiscountService } from '../../discount/discount.service';
 
+@Injectable()
 export class PromotionHandler extends OrderProcessingHandler {
   constructor(private discountService: DiscountService) {
     super();
@@ -13,7 +15,7 @@ export class PromotionHandler extends OrderProcessingHandler {
       throw new InternalServerErrorException('Priced items are missing before applying promocode');
     }
 
-    let totalAfterDiscounts = context.pricedItems.reduce((sum, item) => sum + item.lineTotal, 0);
+    let totalAfterDiscounts = context.total || 0;
     let promoDiscount = 0;
     let finalItems = context.pricedItems;
 
@@ -29,13 +31,9 @@ export class PromotionHandler extends OrderProcessingHandler {
 
       if (validationResult.promocode && validationResult.discountAmount) {
         promoDiscount = validationResult.discountAmount;
-        const promocode = await context.prisma.promocode.findUnique({
-          where: { id: validationResult.promocode.id },
-        });
-
-        if (promocode) {
-          context.appliedPromocode = promocode;
-        }
+        // We can use the promocode from validation result directly as it matches the shape
+        // and we don't need to lock it in the transaction for reading purposes here.
+        context.appliedPromocode = validationResult.promocode as Promocode;
       }
     }
 

@@ -1,7 +1,8 @@
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { OrderProcessingContext } from './order-processing.types';
 import { OrderProcessingHandler } from './order-processing.handler';
 
+@Injectable()
 export class CartValidationHandler extends OrderProcessingHandler {
   protected async process(context: OrderProcessingContext): Promise<OrderProcessingContext> {
     const cart = await context.prisma.cart.findUnique({
@@ -24,11 +25,10 @@ export class CartValidationHandler extends OrderProcessingHandler {
     }
 
     context.cart = cart;
-    context.subtotal = cart.cartItems.reduce(
+    context.total = cart.cartItems.reduce(
       (total, item) => total + item.product.price * item.quantity,
       0,
     );
-    context.total = context.subtotal;
 
     return context;
   }

@@ -2,23 +2,17 @@ import { Injectable, InternalServerErrorException, NotFoundException } from '@ne
 import { PrismaService } from 'src/common/prisma/prisma.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { OrderProcessingContext } from './handlers/order-processing.types';
-import { OrderProcessingHandler } from './handlers/order-processing.handler';
-import { CartValidationHandler } from './handlers/cart-validation.handler';
-import { StockValidationHandler } from './handlers/stock-validation.handler';
-import { DiscountHandler } from './handlers/discount.handler';
-import { PromotionHandler } from './handlers/promotion.handler';
-import { ReservationHandler } from './handlers/reservation.handler';
 import { OrderBuilder } from './builder/order.builder';
 import { OrderDirector } from './builder/order.director';
 import { ChangeStatusOrderDto } from './dto/change-status-order.dto';
 import { UpdateDeliveryDto } from './dto/update-delivery.dto';
-import { DiscountService } from '../discount/discount.service';
+import { OrderChainFactory } from './handlers/order-chain.factory';
 
 @Injectable()
 export class OrderService {
   constructor(
     private prisma: PrismaService,
-    private discountService: DiscountService,
+    private orderChainFactory: OrderChainFactory,
   ) {}
 
   async createOrderFromCart(userId: string, dto: CreateOrderDto) {
@@ -30,7 +24,7 @@ export class OrderService {
         now: new Date(),
       };
 
-      const chain = this.createOrderProcessingChain();
+      const chain = this.orderChainFactory.create();
       const processedContext = await chain.handle(context);
 
       if (!processedContext.pricedItems || processedContext.pricedItems.length === 0) {
@@ -320,21 +314,5 @@ export class OrderService {
         },
       });
     });
-  }
-
-  private createOrderProcessingChain(): OrderProcessingHandler {
-    const cartValidation = new CartValidationHandler();
-    const stockValidation = new StockValidationHandler();
-    const discount = new DiscountHandler();
-    const promotion = new PromotionHandler(this.discountService);
-    const reservation = new ReservationHandler();
-
-    cartValidation
-      .setNext(stockValidation)
-      .setNext(discount)
-      .setNext(promotion)
-      .setNext(reservation);
-
-    return cartValidation;
   }
 }

@@ -1,7 +1,8 @@
-import { InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { OrderProcessingContext, OrderItemCalculation } from './order-processing.types';
 import { OrderProcessingHandler } from './order-processing.handler';
 
+@Injectable()
 export class DiscountHandler extends OrderProcessingHandler {
   protected process(context: OrderProcessingContext): Promise<OrderProcessingContext> {
     if (!context.cart) {
