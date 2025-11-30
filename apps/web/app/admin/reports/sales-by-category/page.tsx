@@ -22,7 +22,7 @@ import {
 
 const chartConfig = {
   totalRevenue: {
-    label: "Total Revenue ($)",
+    label: "Total Revenue (₴)",
     color: "hsl(var(--chart-1))",
   },
   totalItemsSold: {
@@ -100,7 +100,7 @@ export default function SalesByCategoryPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalRevenue.toFixed(2)}</div>
+            <div className="text-2xl font-bold">₴{totalRevenue.toFixed(2)}</div>
           </CardContent>
         </Card>
 
@@ -121,7 +121,7 @@ export default function SalesByCategoryPage() {
         <CardHeader>
           <CardTitle>Revenue and Items by Category</CardTitle>
           <p className="text-sm text-muted-foreground mt-1">
-            Blue bars show revenue ($) on the left axis, Orange bars show items
+            Blue bars show revenue (₴) on the left axis, Orange bars show items
             sold on the right axis
           </p>
         </CardHeader>
@@ -145,7 +145,7 @@ export default function SalesByCategoryPage() {
                   orientation="left"
                   className="text-xs"
                   label={{
-                    value: "Revenue ($)",
+                    value: "Revenue (₴)",
                     angle: -90,
                     position: "insideLeft",
                   }}
@@ -167,7 +167,7 @@ export default function SalesByCategoryPage() {
                   dataKey="totalRevenue"
                   fill="hsl(var(--chart-1))"
                   radius={[4, 4, 0, 0]}
-                  name="Revenue ($)"
+                  name="Revenue (₴)"
                 />
                 <Bar
                   yAxisId="right"
@@ -204,14 +204,14 @@ export default function SalesByCategoryPage() {
                   <tr key={category.categoryId} className="border-b">
                     <td className="p-4 font-medium">{category.categoryName}</td>
                     <td className="text-right p-4">
-                      ${category.totalRevenue.toFixed(2)}
+                      ₴{category.totalRevenue.toFixed(2)}
                     </td>
                     <td className="text-right p-4">
                       {category.totalItemsSold}
                     </td>
                     <td className="text-right p-4">{category.totalOrders}</td>
                     <td className="text-right p-4">
-                      ${category.averageOrderValue.toFixed(2)}
+                      ₴{category.averageOrderValue.toFixed(2)}
                     </td>
                   </tr>
                 ))}

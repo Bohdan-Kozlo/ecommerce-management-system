@@ -291,7 +291,7 @@ export default function ProductsPage() {
             )}
             {minPrice && (
               <Badge variant="secondary">
-                Min: ${minPrice}
+                Min: ₴{minPrice}
                 <button
                   onClick={() => {
                     setMinPrice("");
@@ -305,7 +305,7 @@ export default function ProductsPage() {
             )}
             {maxPrice && (
               <Badge variant="secondary">
-                Max: ${maxPrice}
+                Max: ₴{maxPrice}
                 <button
                   onClick={() => {
                     setMaxPrice("");
@@ -407,19 +407,19 @@ export default function ProductsPage() {
                       product.discount[0] ? (
                         <>
                           <p className="text-lg font-bold text-red-600">
-                            $
+                            ₴
                             {(
                               product.price *
                               (1 - product.discount[0].value / 100)
                             ).toFixed(2)}
                           </p>
                           <p className="text-sm text-muted-foreground line-through">
-                            ${product.price.toFixed(2)}
+                            ₴{product.price.toFixed(2)}
                           </p>
                         </>
                       ) : (
                         <p className="text-lg font-bold">
-                          ${product.price.toFixed(2)}
+                          ₴{product.price.toFixed(2)}
                         </p>
                       )}
                     </div>

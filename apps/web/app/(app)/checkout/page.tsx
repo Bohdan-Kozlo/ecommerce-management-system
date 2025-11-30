@@ -162,7 +162,7 @@ export default function CheckoutPage() {
       const paymentResponse = await createPayment({
         orderId: order.id,
         provider: "stripe",
-        currency: "USD",
+        currency: "UAH",
         returnUrl: `${window.location.origin}/payment/success`,
         cancelUrl: `${window.location.origin}/payment/cancel`,
         delivery: {
@@ -324,7 +324,7 @@ export default function CheckoutPage() {
                         </div>
                         <div className="flex items-center gap-3">
                           <span className="font-semibold">
-                            ${method.price.toFixed(2)}
+                            ₴{method.price.toFixed(2)}
                           </span>
                           {isSelected && (
                             <CheckCircle2 className="h-5 w-5 text-primary" />
@@ -404,13 +404,13 @@ export default function CheckoutPage() {
                           item.product.discount[0] ? (
                             <>
                               <p className="text-sm font-semibold text-red-600">
-                                $
+                                ₴
                                 {(
                                   calculateItemPrice(item) * item.quantity
                                 ).toFixed(2)}
                               </p>
                               <p className="text-xs text-muted-foreground line-through">
-                                $
+                                ₴
                                 {(item.product.price * item.quantity).toFixed(
                                   2
                                 )}
@@ -418,7 +418,7 @@ export default function CheckoutPage() {
                             </>
                           ) : (
                             <p className="text-sm font-semibold">
-                              ${(item.product.price * item.quantity).toFixed(2)}
+                              ₴{(item.product.price * item.quantity).toFixed(2)}
                             </p>
                           )}
                         </div>
@@ -487,25 +487,25 @@ export default function CheckoutPage() {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Subtotal</span>
-                      <span>${subtotalPrice.toFixed(2)}</span>
+                      <span>₴{subtotalPrice.toFixed(2)}</span>
                     </div>
 
                     {appliedPromocode?.valid && (
                       <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
                         <span>Discount</span>
-                        <span>-${discountAmount.toFixed(2)}</span>
+                        <span>-₴{discountAmount.toFixed(2)}</span>
                       </div>
                     )}
 
                     <div className="flex justify-between text-sm">
                       <span className="text-muted-foreground">Delivery</span>
-                      <span>${deliveryPrice.toFixed(2)}</span>
+                      <span>₴{deliveryPrice.toFixed(2)}</span>
                     </div>
 
                     <div className="border-t pt-2">
                       <div className="flex justify-between text-lg font-bold">
                         <span>Total</span>
-                        <span>${totalPrice.toFixed(2)}</span>
+                        <span>₴{totalPrice.toFixed(2)}</span>
                       </div>
                     </div>
                   </div>

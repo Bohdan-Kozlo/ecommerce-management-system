@@ -115,7 +115,7 @@ export default function OrdersPage() {
                   <div>
                     <p className="text-sm text-muted-foreground">Total</p>
                     <p className="font-medium">
-                      ${order.totalAmount.toFixed(2)}
+                      ₴{order.totalAmount.toFixed(2)}
                     </p>
                   </div>
                 </div>

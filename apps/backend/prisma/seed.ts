@@ -1,12 +1,4 @@
-import {
-  PrismaClient,
-  Category,
-  Product,
-  User,
-  Role,
-  OrderStatus,
-  DeliveryMethod,
-} from '@prisma/client';
+import { PrismaClient, Category, OrderStatus, DeliveryMethod } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 import * as bcrypt from 'bcrypt';
 
@@ -15,241 +7,245 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Seeding database...');
 
-  console.log('Clearing existing data...');
-  await prisma.orderItem.deleteMany();
-  await prisma.delivery.deleteMany();
-  await prisma.order.deleteMany();
-  await prisma.cartItem.deleteMany();
-  await prisma.cart.deleteMany();
-  await prisma.discount.deleteMany();
-  await prisma.promocode.deleteMany();
-  await prisma.productImage.deleteMany();
-  await prisma.product.deleteMany();
-  await prisma.category.deleteMany();
-  await prisma.user.deleteMany();
-
-  console.log('Creating users...');
-  const users: User[] = [];
-  const hashedPassword = await bcrypt.hash('password123', 10);
-
-  const adminUser = (await prisma.user.create({
-    data: {
-      email: 'admin@example.com',
-      password: hashedPassword,
-      firstName: 'Admin',
-      lastName: 'User',
-      phone: faker.phone.number(),
-      address: faker.location.streetAddress(true),
-      role: Role.ADMIN,
-    },
-  })) as User;
-  users.push(adminUser);
-
-  for (let i = 0; i < 10; i++) {
-    const user = (await prisma.user.create({
-      data: {
-        email: faker.internet.email(),
-        password: hashedPassword,
-        firstName: faker.person.firstName(),
-        lastName: faker.person.lastName(),
-        phone: faker.phone.number(),
-        address: faker.location.streetAddress(true),
-        role: Role.USER,
-      },
-    })) as User;
-    users.push(user);
-  }
-  console.log(`Created ${users.length} users`);
-
-  console.log('Creating categories...');
-  const categoryNames = [
-    'Electronics',
-    'Clothing',
-    'Books',
-    'Home & Garden',
-    'Sports & Outdoors',
-    'Toys & Games',
-    'Food & Beverages',
-    'Health & Beauty',
+  // 1. Categories
+  const categoriesData = [
+    { name: 'Smartphones', description: 'Latest mobile phones and smartphones' },
+    { name: 'Laptops', description: 'High performance laptops and notebooks' },
+    { name: 'Audio', description: 'Headphones, speakers, and audio equipment' },
+    { name: 'Wearables', description: 'Smartwatches, fitness trackers, and wearable tech' },
+    { name: 'Accessories', description: 'Essential tech accessories, cables, and chargers' },
   ];
+
   const categories: Category[] = [];
-  for (const name of categoryNames) {
-    const category = (await prisma.category.create({
-      data: {
-        name,
-        description: faker.lorem.sentence(),
-      },
-    })) as Category;
+  for (const cat of categoriesData) {
+    const category = await prisma.category.upsert({
+      where: { name: cat.name },
+      update: {},
+      create: cat,
+    });
     categories.push(category);
   }
-  console.log(`Created ${categories.length} categories`);
 
-  console.log('Creating products...');
-  const products: Product[] = [];
-  for (let i = 0; i < 50; i++) {
-    const product = (await prisma.product.create({
-      data: {
-        name: faker.commerce.productName(),
-        description: faker.commerce.productDescription(),
-        price: parseFloat(faker.commerce.price({ min: 10, max: 1000 })),
-        stock: faker.number.int({ min: 0, max: 100 }),
-        categoryId: faker.helpers.arrayElement(categories).id,
-      },
-    })) as Product;
-    products.push(product);
-  }
-  console.log(`Created ${products.length} products`);
+  const productsData = [
+    {
+      name: 'iPhone 15 Pro',
+      description:
+        'The ultimate iPhone with titanium design, A17 Pro chip, and advanced camera system.',
+      price: 999,
+      stock: 50,
+      categoryName: 'Smartphones',
+      image: 'https://placehold.co/600x400/png?text=iPhone+15+Pro',
+    },
+    {
+      name: 'Samsung Galaxy S24 Ultra',
+      description:
+        'Galaxy AI is here. Unleash new levels of creativity, productivity and possibility.',
+      price: 1299,
+      stock: 50,
+      categoryName: 'Smartphones',
+      image: 'https://placehold.co/600x400/png?text=Samsung+Galaxy+S24',
+    },
+    {
+      name: 'MacBook Air M3',
+      description: 'Lean. Mean. M3 machine. Supercharged by the next-generation M3 chip.',
+      price: 1099,
+      stock: 30,
+      categoryName: 'Laptops',
+      image: 'https://placehold.co/600x400/png?text=MacBook+Air+M3',
+    },
+    {
+      name: 'Dell XPS 15',
+      description: 'Power and portability defined. Stunning display and powerful performance.',
+      price: 1499,
+      stock: 20,
+      categoryName: 'Laptops',
+      image: 'https://placehold.co/600x400/png?text=Dell+XPS+15',
+    },
+    {
+      name: 'Sony WH-1000XM5',
+      description: 'Industry leading noise cancellation with exceptional sound quality.',
+      price: 349,
+      stock: 100,
+      categoryName: 'Audio',
+      image: 'https://placehold.co/600x400/png?text=Sony+Headphones',
+    },
+    {
+      name: 'AirPods Pro 2',
+      description:
+        'Magic like you’ve never heard. Active Noise Cancellation and Transparency mode.',
+      price: 249,
+      stock: 150,
+      categoryName: 'Audio',
+      image: 'https://placehold.co/600x400/png?text=AirPods+Pro',
+    },
+    {
+      name: 'Apple Watch Series 9',
+      description: 'Smarter. Brighter. Mightier. The most powerful chip in Apple Watch ever.',
+      price: 399,
+      stock: 60,
+      categoryName: 'Wearables',
+      image: 'https://placehold.co/600x400/png?text=Apple+Watch',
+    },
+    {
+      name: 'Garmin Fenix 7',
+      description: 'Built for the outdoors. Long battery life and advanced training features.',
+      price: 699,
+      stock: 25,
+      categoryName: 'Wearables',
+      image: 'https://placehold.co/600x400/png?text=Garmin+Fenix',
+    },
+    {
+      name: 'Anker 737 Power Bank',
+      description: 'Ultra-powerful two-way charging. 24,000mAh capacity.',
+      price: 149,
+      stock: 200,
+      categoryName: 'Accessories',
+      image: 'https://placehold.co/600x400/png?text=Anker+Power+Bank',
+    },
+    {
+      name: 'Logitech MX Master 3S',
+      description: 'An icon remastered. Quiet clicks and 8K DPI tracking.',
+      price: 99,
+      stock: 80,
+      categoryName: 'Accessories',
+      image: 'https://placehold.co/600x400/png?text=Logitech+Mouse',
+    },
+  ];
 
-  console.log('Creating product images...');
-  let imageCount = 0;
-  for (const product of products) {
-    const numImages = faker.number.int({ min: 1, max: 4 });
-    for (let i = 0; i < numImages; i++) {
-      await prisma.productImage.create({
+  for (const prod of productsData) {
+    const category = categories.find((c) => c.name === prod.categoryName);
+    if (!category) continue;
+
+    const existingProduct = await prisma.product.findFirst({
+      where: { name: prod.name },
+    });
+
+    if (!existingProduct) {
+      const product = await prisma.product.create({
         data: {
-          url: faker.image.url({ width: 640, height: 480 }),
-          productId: product.id,
+          name: prod.name,
+          description: prod.description,
+          price: prod.price,
+          stock: prod.stock,
+          categoryId: category.id,
+          productImages: {
+            create: {
+              url: prod.image,
+            },
+          },
         },
       });
-      imageCount++;
+      console.log(`Created product: ${product.name}`);
+
+      if (faker.datatype.boolean({ probability: 0.3 })) {
+        await prisma.discount.create({
+          data: {
+            value: faker.number.int({ min: 5, max: 25 }),
+            startDate: faker.date.recent(),
+            endDate: faker.date.future(),
+            isActive: true,
+            productId: product.id,
+          },
+        });
+        console.log(`Added discount to ${product.name}`);
+      }
+    } else {
+      console.log(`Product ${prod.name} already exists, skipping.`);
     }
   }
-  console.log(`Created ${imageCount} product images`);
 
   console.log('Creating promocodes...');
-  const promocodes: { id: string; code: string; value: number }[] = [];
   for (let i = 0; i < 5; i++) {
-    const promocode = await prisma.promocode.create({
-      data: {
-        code: faker.string.alphanumeric({ length: 8, casing: 'upper' }),
-        value: faker.number.int({ min: 5, max: 50 }),
-        minOrderAmount: faker.number.float({ min: 50, max: 200, fractionDigits: 2 }),
-        maxUsage: faker.number.int({ min: 10, max: 100 }),
-        usedCount: faker.number.int({ min: 0, max: 5 }),
-        isActive: faker.datatype.boolean({ probability: 0.8 }),
-      },
-    });
-    promocodes.push(promocode);
-  }
-  console.log(`Created ${promocodes.length} promocodes`);
-
-  console.log('Creating discounts...');
-  const discountProducts = faker.helpers.arrayElements(products, 15);
-  let discountCount = 0;
-  for (const product of discountProducts) {
-    await prisma.discount.create({
-      data: {
-        value: faker.number.int({ min: 5, max: 50 }),
-        startDate: faker.date.past(),
-        endDate: faker.date.future(),
-        isActive: faker.datatype.boolean({ probability: 0.7 }),
-        productId: product.id,
-      },
-    });
-    discountCount++;
-  }
-  console.log(`Created ${discountCount} discounts`);
-
-  // Create carts
-  console.log('Creating carts...');
-  const carts: { id: string; userId: string }[] = [];
-  for (const user of users.slice(1, 6)) {
-    const cart = await prisma.cart.create({
-      data: {
-        userId: user.id,
-      },
-    });
-    carts.push(cart);
-  }
-  console.log(`Created ${carts.length} carts`);
-
-  console.log('Creating cart items...');
-  let cartItemCount = 0;
-  for (const cart of carts) {
-    const numItems = faker.number.int({ min: 1, max: 5 });
-    const selectedProducts = faker.helpers.arrayElements(products, numItems);
-    for (const product of selectedProducts) {
-      await prisma.cartItem.create({
+    const code = faker.string.alphanumeric({ length: 8, casing: 'upper' });
+    const existing = await prisma.promocode.findUnique({ where: { code } });
+    if (!existing) {
+      await prisma.promocode.create({
         data: {
-          cartId: cart.id,
-          productId: product.id,
-          quantity: faker.number.int({ min: 1, max: 5 }),
+          code,
+          value: faker.number.int({ min: 5, max: 20 }),
+          minOrderAmount: faker.number.int({ min: 50, max: 200 }),
+          maxUsage: faker.number.int({ min: 10, max: 100 }),
+          isActive: true,
         },
       });
-      cartItemCount++;
     }
   }
-  console.log(`Created ${cartItemCount} cart items`);
 
-  console.log('Creating orders...');
-  const orders: { id: string; status: OrderStatus; userId: string; totalAmount: number }[] = [];
-  const orderStatuses = [
-    OrderStatus.PENDING,
-    OrderStatus.PAID,
-    OrderStatus.SHIPPED,
-    OrderStatus.DELIVERED,
-    OrderStatus.CANCELED,
-  ];
-  for (const user of users.slice(1)) {
-    const numOrders = faker.number.int({ min: 0, max: 3 });
-    for (let i = 0; i < numOrders; i++) {
-      const usePromocode = faker.datatype.boolean({ probability: 0.3 });
-      const order = await prisma.order.create({
+  console.log('Created 5 promocodes');
+
+  // 4. Users & Orders
+  console.log('Checking users...');
+  const users = await prisma.user.findMany();
+  if (users.length === 0) {
+    console.log('No users found. Creating a demo user...');
+    const hashedPassword = await bcrypt.hash('password123', 10);
+    const user = await prisma.user.create({
+      data: {
+        email: 'demo@example.com',
+        password: hashedPassword,
+        firstName: 'Demo',
+        lastName: 'User',
+        phone: '+1234567890',
+        address: '123 Demo St, Demo City',
+        role: 'USER',
+      },
+    });
+    users.push(user);
+    console.log('Created demo user: demo@example.com');
+  }
+
+  console.log('Generating orders...');
+  const allProducts = await prisma.product.findMany();
+
+  if (allProducts.length > 0 && users.length > 0) {
+    for (let i = 0; i < 20; i++) {
+      const user = faker.helpers.arrayElement(users);
+      const numItems = faker.number.int({ min: 1, max: 5 });
+      const orderItemsData: { productId: string; quantity: number; price: number }[] = [];
+      let totalAmount = 0;
+
+      for (let j = 0; j < numItems; j++) {
+        const product = faker.helpers.arrayElement(allProducts);
+        const quantity = faker.number.int({ min: 1, max: 3 });
+        const price = product.price;
+
+        orderItemsData.push({
+          productId: product.id,
+          quantity,
+          price,
+        });
+        totalAmount += price * quantity;
+      }
+
+      const status = faker.helpers.enumValue(OrderStatus);
+
+      await prisma.order.create({
         data: {
-          status: faker.helpers.arrayElement(orderStatuses),
           userId: user.id,
-          totalAmount: faker.number.float({ min: 50, max: 1000, fractionDigits: 2 }),
-          promocodeId: usePromocode ? faker.helpers.arrayElement(promocodes).id : undefined,
+          status: status,
+          totalAmount: totalAmount,
+          orderItems: {
+            create: orderItemsData,
+          },
+          delivery: {
+            create: {
+              address: user.address || faker.location.streetAddress(),
+              email: user.email,
+              phone: user.phone || faker.phone.number(),
+              method: faker.helpers.enumValue(DeliveryMethod),
+            },
+          },
         },
       });
-      orders.push(order);
     }
+    console.log('Created 20 orders');
   }
-  console.log(`Created ${orders.length} orders`);
 
-  console.log('Creating order items...');
-  let orderItemCount = 0;
-  for (const order of orders) {
-    const numItems = faker.number.int({ min: 1, max: 5 });
-    const selectedProducts = faker.helpers.arrayElements(products, numItems);
-    for (const product of selectedProducts) {
-      await prisma.orderItem.create({
-        data: {
-          orderId: order.id,
-          productId: product.id,
-          quantity: faker.number.int({ min: 1, max: 3 }),
-          price: parseFloat(product.price.toString()),
-        },
-      });
-      orderItemCount++;
-    }
-  }
-  console.log(`Created ${orderItemCount} order items`);
-
-  console.log('Creating deliveries...');
-  const deliveryMethods = [
-    DeliveryMethod.COUIRIER,
-    DeliveryMethod.LOCKER,
-    DeliveryMethod.DEPARTMENT,
-  ];
-  let deliveryCount = 0;
-  for (const order of orders) {
-    await prisma.delivery.create({
-      data: {
-        orderId: order.id,
-        address: faker.location.streetAddress(true),
-        email: faker.internet.email(),
-        phone: faker.phone.number(),
-        method: faker.helpers.arrayElement(deliveryMethods),
-      },
-    });
-    deliveryCount++;
-  }
-  console.log(`Created ${deliveryCount} deliveries`);
+  console.log('Seeding completed.');
 }
 
 main()
-  .catch((e: Error) => {
+  .catch((e) => {
     console.error(e);
     process.exit(1);
   })

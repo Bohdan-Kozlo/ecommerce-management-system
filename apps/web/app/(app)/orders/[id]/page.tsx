@@ -218,7 +218,7 @@ export default function OrderDetailsPage({
                         Qty: {item.quantity}
                       </span>
                       <span className="text-muted-foreground">
-                        ${item.price.toFixed(2)} each
+                        ₴{item.price.toFixed(2)} each
                       </span>
                     </div>
                   </div>
@@ -226,7 +226,7 @@ export default function OrderDetailsPage({
                   {/* Price */}
                   <div className="text-right">
                     <p className="font-bold text-lg">
-                      ${(item.price * item.quantity).toFixed(2)}
+                      ₴{(item.price * item.quantity).toFixed(2)}
                     </p>
                   </div>
                 </div>
@@ -307,7 +307,7 @@ export default function OrderDetailsPage({
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal</span>
                   <span>
-                    $
+                    ₴
                     {order.orderItems
                       ?.reduce(
                         (sum, item) => sum + item.price * item.quantity,
@@ -321,7 +321,7 @@ export default function OrderDetailsPage({
                   <div className="flex justify-between text-sm text-green-600 dark:text-green-400">
                     <span>Promo Code Applied</span>
                     <span>
-                      -$
+                      -₴
                       {(
                         order.orderItems?.reduce(
                           (sum, item) => sum + item.price * item.quantity,
@@ -335,7 +335,7 @@ export default function OrderDetailsPage({
                 <div className="border-t pt-3">
                   <div className="flex justify-between text-lg font-bold">
                     <span>Total</span>
-                    <span>${order.totalAmount.toFixed(2)}</span>
+                    <span>₴{order.totalAmount.toFixed(2)}</span>
                   </div>
                 </div>
               </div>

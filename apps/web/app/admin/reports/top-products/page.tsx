@@ -107,7 +107,7 @@ export default function TopProductsPage() {
             <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">${totalRevenue.toFixed(2)}</div>
+            <div className="text-2xl font-bold">₴{totalRevenue.toFixed(2)}</div>
           </CardContent>
         </Card>
 
@@ -210,7 +210,7 @@ export default function TopProductsPage() {
                       {product.totalQuantitySold}
                     </td>
                     <td className="text-right p-4 font-medium">
-                      ${product.totalRevenue.toFixed(2)}
+                      ₴{product.totalRevenue.toFixed(2)}
                     </td>
                     <td className="text-right p-4">{product.ordersCount}</td>
                     <td className="text-right p-4">

@@ -180,21 +180,21 @@ export default function ProductDetailPage({
             product.discount[0] ? (
               <div className="flex items-baseline gap-3">
                 <p className="text-4xl font-bold text-red-600">
-                  $
+                  ₴
                   {(
                     product.price *
                     (1 - product.discount[0].value / 100)
                   ).toFixed(2)}
                 </p>
                 <p className="text-2xl text-muted-foreground line-through">
-                  ${product.price.toFixed(2)}
+                  ₴{product.price.toFixed(2)}
                 </p>
                 <Badge variant="destructive" className="bg-red-600">
                   -{product.discount[0].value}% OFF
                 </Badge>
               </div>
             ) : (
-              <p className="text-4xl font-bold">${product.price.toFixed(2)}</p>
+              <p className="text-4xl font-bold">₴{product.price.toFixed(2)}</p>
             )}
             {product.stock > 0 ? (
               <Badge variant="secondary">{product.stock} in stock</Badge>

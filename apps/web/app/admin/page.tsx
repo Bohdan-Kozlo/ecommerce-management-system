@@ -84,7 +84,7 @@ export default function AdminPage() {
           </Card>
         </Link>
 
-        <Link href="/admin/orders">
+        <Link href="/admin/products">
           <Card className="hover:border-primary transition-colors cursor-pointer">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-lg font-semibold">

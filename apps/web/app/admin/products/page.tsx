@@ -212,7 +212,7 @@ export default function AdminProductsPage() {
                       <TableCell>
                         {product.Category?.name || "No category"}
                       </TableCell>
-                      <TableCell>${product.price.toFixed(2)}</TableCell>
+                      <TableCell>₴{product.price.toFixed(2)}</TableCell>
                       <TableCell>{product.stock}</TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-2">

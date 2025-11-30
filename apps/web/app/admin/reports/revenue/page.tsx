@@ -95,7 +95,7 @@ export default function RevenuePage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              ${revenueData.totalRevenue.toFixed(2)}
+              ₴{revenueData.totalRevenue.toFixed(2)}
             </div>
           </CardContent>
         </Card>
@@ -119,7 +119,7 @@ export default function RevenuePage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              ${revenueData.averageOrderValue.toFixed(2)}
+              ₴{revenueData.averageOrderValue.toFixed(2)}
             </div>
           </CardContent>
         </Card>
@@ -150,7 +150,7 @@ export default function RevenuePage() {
                   className="text-xs"
                 />
                 <YAxis
-                  tickFormatter={(value) => `$${value}`}
+                  tickFormatter={(value) => `₴${value}`}
                   className="text-xs"
                 />
                 <ChartTooltip
@@ -158,14 +158,14 @@ export default function RevenuePage() {
                     <ChartTooltipContent
                       labelFormatter={(value) => {
                         const date = new Date(value);
-                        return date.toLocaleDateString("en-US", {
+                        return date.toLocaleDateString("uk-UA", {
                           month: "long",
                           day: "numeric",
                           year: "numeric",
                         });
                       }}
                       formatter={(value) => [
-                        `$${Number(value).toFixed(2)}`,
+                        `₴${Number(value).toFixed(2)}`,
                         "Revenue",
                       ]}
                     />

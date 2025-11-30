@@ -253,7 +253,7 @@ export default function CartPage() {
                 <span className="text-muted-foreground">
                   Subtotal ({totalItems} items)
                 </span>
-                <span className="font-medium">${subtotalPrice.toFixed(2)}</span>
+                <span className="font-medium">₴{subtotalPrice.toFixed(2)}</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Shipping</span>
@@ -263,7 +263,7 @@ export default function CartPage() {
               <div className="border-t pt-4">
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span>${subtotalPrice.toFixed(2)}</span>
+                  <span>₴{subtotalPrice.toFixed(2)}</span>
                 </div>
               </div>
               <div className="flex items-start gap-2 text-xs text-muted-foreground bg-muted p-3 rounded">
@@ -399,7 +399,7 @@ function CartItemCard({ item, onUpdateQuantity, onRemove }: CartItemCardProps) {
                   <>
                     <div className="flex items-center gap-2 justify-end">
                       <p className="text-sm text-red-600 font-semibold">
-                        $
+                        ₴
                         {(
                           product.price *
                           (1 - product.discount[0].value / 100)
@@ -411,10 +411,10 @@ function CartItemCard({ item, onUpdateQuantity, onRemove }: CartItemCardProps) {
                       </span>
                     </div>
                     <p className="text-xs text-muted-foreground line-through">
-                      ${product.price.toFixed(2)}
+                      ₴{product.price.toFixed(2)}
                     </p>
                     <p className="text-lg font-bold text-red-600">
-                      $
+                      ₴
                       {(
                         product.price *
                         (1 - product.discount[0].value / 100) *
@@ -425,9 +425,9 @@ function CartItemCard({ item, onUpdateQuantity, onRemove }: CartItemCardProps) {
                 ) : (
                   <>
                     <p className="text-sm text-muted-foreground">
-                      ${product.price.toFixed(2)} each
+                      ₴{product.price.toFixed(2)} each
                     </p>
-                    <p className="text-lg font-bold">${subtotal.toFixed(2)}</p>
+                    <p className="text-lg font-bold">₴{subtotal.toFixed(2)}</p>
                   </>
                 )}
               </div>

@@ -20,6 +20,11 @@ const nextConfig = {
         protocol: 'https',
         hostname: 'snamizkalssemrhgaccl.supabase.co',
         pathname: '/storage/v1/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'placehold.co',
+        pathname: '/**',
       }
     ],
   },

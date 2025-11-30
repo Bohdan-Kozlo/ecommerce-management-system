@@ -17,7 +17,7 @@ export class PaymentController {
   }
 
   @Post('webhook')
-  webhook(@Req() req: Request) {
-    return this.paymentService.handleCallback(req.body as Buffer, req.headers);
+  webhook(@Req() req: Request & { rawBody: Buffer }) {
+    return this.paymentService.handleCallback(req.rawBody, req.headers);
   }
 }
