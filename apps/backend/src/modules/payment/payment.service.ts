@@ -40,6 +40,9 @@ export class PaymentService {
       totalAmount: order.totalAmount,
       orderItems: order.orderItems,
       products: order.orderItems.map((item) => item.product),
+      deliveryPrice:
+        order.totalAmount -
+        order.orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
     };
 
     const result = await this.paymentAdapter.createPayment(createPaymentDto, orderInfo);

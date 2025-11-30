@@ -31,8 +31,6 @@ export class PromotionHandler extends OrderProcessingHandler {
 
       if (validationResult.promocode && validationResult.discountAmount) {
         promoDiscount = validationResult.discountAmount;
-        // We can use the promocode from validation result directly as it matches the shape
-        // and we don't need to lock it in the transaction for reading purposes here.
         context.appliedPromocode = validationResult.promocode as Promocode;
       }
     }

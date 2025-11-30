@@ -7,6 +7,40 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('Seeding database...');
 
+  // 0. Delivery Options
+  const deliveryOptionsData = [
+    {
+      method: DeliveryMethod.COUIRIER,
+      name: 'Courier Delivery',
+      description: 'Delivery to your door',
+      price: 50,
+    },
+    {
+      method: DeliveryMethod.LOCKER,
+      name: 'Parcel Locker',
+      description: 'Pick up from a locker',
+      price: 40,
+    },
+    {
+      method: DeliveryMethod.DEPARTMENT,
+      name: 'Post Office',
+      description: 'Pick up from post office',
+      price: 30,
+    },
+  ];
+
+  for (const option of deliveryOptionsData) {
+    await prisma.deliveryOption.upsert({
+      where: { method: option.method },
+      update: {
+        name: option.name,
+        description: option.description,
+        price: option.price,
+      },
+      create: option,
+    });
+  }
+
   // 1. Categories
   const categoriesData = [
     { name: 'Smartphones', description: 'Latest mobile phones and smartphones' },

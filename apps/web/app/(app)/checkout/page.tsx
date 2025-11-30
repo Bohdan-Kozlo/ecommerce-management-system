@@ -30,38 +30,25 @@ import {
 } from "@/services/discount.service";
 import { createOrder } from "@/services/order.service";
 import { createPayment } from "@/services/payment.service";
+import { getDeliveryOptions } from "@/services/delivery.service";
 import type { ICart } from "@/shared/types/cart.interface";
-import { DeliveryMethod } from "@/shared/types/order.interface";
+import {
+  DeliveryMethod,
+  type IDeliveryOption,
+} from "@/shared/types/order.interface";
 
-const deliveryMethods = [
-  {
-    value: DeliveryMethod.COUIRIER,
-    label: "Courier Delivery",
-    description: "Delivery to your door",
-    icon: Truck,
-    price: 5.99,
-  },
-  {
-    value: DeliveryMethod.LOCKER,
-    label: "Parcel Locker",
-    description: "Pick up from a locker",
-    icon: Package,
-    price: 2.99,
-  },
-  {
-    value: DeliveryMethod.DEPARTMENT,
-    label: "Post Office",
-    description: "Pick up from post office",
-    icon: MapPin,
-    price: 3.99,
-  },
-];
+const DELIVERY_ICONS = {
+  [DeliveryMethod.COUIRIER]: Truck,
+  [DeliveryMethod.LOCKER]: Package,
+  [DeliveryMethod.DEPARTMENT]: MapPin,
+};
 
 export default function CheckoutPage() {
   const router = useRouter();
   const [cart, setCart] = useState<ICart | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  const [deliveryOptions, setDeliveryOptions] = useState<IDeliveryOption[]>([]);
 
   // Form state
   const [email, setEmail] = useState("");
@@ -78,18 +65,25 @@ export default function CheckoutPage() {
     useState<IPromocodeValidationResponse | null>(null);
 
   useEffect(() => {
-    fetchCart();
+    fetchData();
   }, []);
 
-  async function fetchCart() {
+  async function fetchData() {
     setLoading(true);
     try {
-      const data = await getUserCart();
-      if (data) {
-        setCart(data);
+      const [cartData, optionsData] = await Promise.all([
+        getUserCart(),
+        getDeliveryOptions(),
+      ]);
+
+      if (cartData) {
+        setCart(cartData);
+      }
+      if (optionsData) {
+        setDeliveryOptions(optionsData);
       }
     } catch (error) {
-      console.error("Failed to fetch cart:", error);
+      console.error("Failed to fetch data:", error);
     } finally {
       setLoading(false);
     }
@@ -146,7 +140,7 @@ export default function CheckoutPage() {
     setSubmitting(true);
     try {
       const order = await createOrder({
-        promocodeId: appliedPromocode?.promocode?.id,
+        promocode: appliedPromocode?.promocode?.code,
         delivery: {
           email,
           phone: phone || undefined,
@@ -204,8 +198,8 @@ export default function CheckoutPage() {
     0
   );
   const discountAmount = appliedPromocode?.discountAmount || 0;
-  const selectedDelivery = deliveryMethods.find(
-    (m) => m.value === deliveryMethod
+  const selectedDelivery = deliveryOptions.find(
+    (m) => m.method === deliveryMethod
   );
   const deliveryPrice = selectedDelivery?.price || 0;
   const totalPrice = subtotalPrice - discountAmount + deliveryPrice;
@@ -297,15 +291,15 @@ export default function CheckoutPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
-                {deliveryMethods.map((method) => {
-                  const Icon = method.icon;
-                  const isSelected = deliveryMethod === method.value;
+                {deliveryOptions.map((option) => {
+                  const Icon = DELIVERY_ICONS[option.method] || Truck;
+                  const isSelected = deliveryMethod === option.method;
 
                   return (
                     <button
-                      key={method.value}
+                      key={option.id}
                       type="button"
-                      onClick={() => setDeliveryMethod(method.value)}
+                      onClick={() => setDeliveryMethod(option.method)}
                       className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
                         isSelected
                           ? "border-primary bg-primary/5"
@@ -316,15 +310,15 @@ export default function CheckoutPage() {
                         <div className="flex items-center gap-3">
                           <Icon className="h-5 w-5" />
                           <div>
-                            <p className="font-medium">{method.label}</p>
+                            <p className="font-medium">{option.name}</p>
                             <p className="text-sm text-muted-foreground">
-                              {method.description}
+                              {option.description}
                             </p>
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
                           <span className="font-semibold">
-                            ₴{method.price.toFixed(2)}
+                            ₴{option.price.toFixed(2)}
                           </span>
                           {isSelected && (
                             <CheckCircle2 className="h-5 w-5 text-primary" />

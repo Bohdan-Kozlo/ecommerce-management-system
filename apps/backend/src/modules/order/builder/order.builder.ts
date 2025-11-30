@@ -1,18 +1,20 @@
 import { Prisma, Promocode } from '@prisma/client';
 import { OrderItemCalculation } from '../handlers/order-processing.types';
-import { IOrderBuilder } from './order-builder.interface';
+import { IOrderBuilder, DeliveryInput } from './order-builder.interface';
 
 export class OrderBuilder implements IOrderBuilder {
   private userId?: string;
   private totalAmount = 0;
   private promocodeId?: string;
   private items: OrderItemCalculation[] = [];
+  private delivery?: DeliveryInput;
 
   reset(): this {
     this.userId = undefined;
     this.totalAmount = 0;
     this.promocodeId = undefined;
     this.items = [];
+    this.delivery = undefined;
     return this;
   }
 
@@ -36,6 +38,11 @@ export class OrderBuilder implements IOrderBuilder {
     return this;
   }
 
+  setDelivery(delivery: DeliveryInput): this {
+    this.delivery = delivery;
+    return this;
+  }
+
   build(): Prisma.OrderCreateInput {
     if (!this.userId) {
       throw new Error('User id is required to build an order');
@@ -43,6 +50,10 @@ export class OrderBuilder implements IOrderBuilder {
 
     if (this.items.length === 0) {
       throw new Error('At least one order item is required');
+    }
+
+    if (!this.delivery) {
+      throw new Error('Delivery information is required');
     }
 
     const orderData: Prisma.OrderCreateInput = {
@@ -58,6 +69,14 @@ export class OrderBuilder implements IOrderBuilder {
             connect: { id: item.productId },
           },
         })),
+      },
+      delivery: {
+        create: {
+          address: this.delivery.address,
+          email: this.delivery.email,
+          phone: this.delivery.phone,
+          method: this.delivery.method,
+        },
       },
     };
 

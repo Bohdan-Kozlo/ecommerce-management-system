@@ -1,5 +1,12 @@
-import { Prisma, Promocode } from '@prisma/client';
+import { Prisma, Promocode, DeliveryMethod } from '@prisma/client';
 import { OrderItemCalculation } from '../handlers/order-processing.types';
+
+export interface DeliveryInput {
+  address: string;
+  email: string;
+  phone?: string;
+  method: DeliveryMethod;
+}
 
 export interface IOrderBuilder {
   reset(): this;
@@ -7,6 +14,7 @@ export interface IOrderBuilder {
   setTotalAmount(amount: number): this;
   setPromocode(promocode?: Promocode): this;
   setOrderItems(items: OrderItemCalculation[]): this;
+  setDelivery(delivery: DeliveryInput): this;
   build(): Prisma.OrderCreateInput;
 }
 
@@ -15,4 +23,5 @@ export interface OrderBuildInput {
   totalAmount: number;
   items: OrderItemCalculation[];
   promocode?: Promocode;
+  delivery: DeliveryInput;
 }

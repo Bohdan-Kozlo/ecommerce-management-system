@@ -13,6 +13,12 @@ export class DeliveryService implements PaymentObserver, OnModuleInit, OnModuleD
 
   private readonly logger = new Logger(DeliveryService.name);
 
+  async getDeliveryOptions() {
+    return this.prisma.deliveryOption.findMany({
+      where: { isActive: true },
+    });
+  }
+
   onModuleInit(): void {
     this.paymentSubject.register(this);
   }

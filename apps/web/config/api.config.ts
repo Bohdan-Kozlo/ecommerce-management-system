@@ -37,4 +37,7 @@ export const API_URL = {
   },
   payment: (url = "") => `${SERVER_URL}/payments/${url}`,
   report: (url = "") => `${SERVER_URL}/reports/${url}`,
+  delivery: {
+    options: () => `${SERVER_URL}/delivery/options`,
+  },
 };

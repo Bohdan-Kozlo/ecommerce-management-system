@@ -18,6 +18,7 @@ export interface OrderInfo {
   totalAmount: number;
   orderItems: OrderItem[];
   products: Array<Product & { productImages: { url: string }[] }>;
+  deliveryPrice?: number;
 }
 
 export interface PaymentCreationResult {

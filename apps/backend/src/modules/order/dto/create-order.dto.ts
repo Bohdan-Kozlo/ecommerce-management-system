@@ -2,7 +2,7 @@ import { IsOptional, IsString, IsEmail, IsEnum, ValidateNested } from 'class-val
 import { Type } from 'class-transformer';
 import { DeliveryMethod } from '@prisma/client';
 
-class DeliveryDto {
+export class DeliveryDto {
   @IsString()
   address!: string;
 

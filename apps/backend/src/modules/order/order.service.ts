@@ -16,16 +16,24 @@ export class OrderService {
   ) {}
 
   async createOrderFromCart(userId: string, dto: CreateOrderDto) {
+    if (!dto.delivery || !dto.delivery.method) {
+      throw new InternalServerErrorException('Delivery method is required');
+    }
+
     return this.prisma.$transaction(async (tx) => {
       const context: OrderProcessingContext = {
         prisma: tx,
         userId,
         promocodeCode: dto.promocode,
+        deliveryMethod: dto.delivery.method,
         now: new Date(),
       };
 
       const chain = this.orderChainFactory.create();
       const processedContext = await chain.handle(context);
+
+      console.log('Processed context total:', processedContext.total);
+      console.log('Processed context deliveryPrice:', processedContext.deliveryPrice);
 
       if (!processedContext.pricedItems || processedContext.pricedItems.length === 0) {
         throw new InternalServerErrorException('Order items were not prepared correctly');
@@ -37,12 +45,14 @@ export class OrderService {
         totalAmount: processedContext.total ?? 0,
         items: processedContext.pricedItems,
         promocode: processedContext.appliedPromocode,
+        delivery: dto.delivery,
       });
 
       const order = await tx.order.create({
         data: orderData,
         include: {
           orderItems: true,
+          delivery: true,
         },
       });
 

@@ -8,6 +8,7 @@ import { StockValidationHandler } from './handlers/stock-validation.handler';
 import { DiscountHandler } from './handlers/discount.handler';
 import { PromotionHandler } from './handlers/promotion.handler';
 import { ReservationHandler } from './handlers/reservation.handler';
+import { DeliveryCalculationHandler } from './handlers/delivery-calculation.handler';
 
 @Module({
   imports: [DiscountModule],
@@ -20,6 +21,7 @@ import { ReservationHandler } from './handlers/reservation.handler';
     DiscountHandler,
     PromotionHandler,
     ReservationHandler,
+    DeliveryCalculationHandler,
   ],
 })
 export class OrderModule {}

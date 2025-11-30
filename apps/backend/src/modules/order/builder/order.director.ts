@@ -11,6 +11,7 @@ export class OrderDirector {
       .setTotalAmount(input.totalAmount)
       .setOrderItems(input.items)
       .setPromocode(input.promocode)
+      .setDelivery(input.delivery)
       .build();
   }
 }

@@ -167,3 +167,14 @@ enum DeliveryMethod {
   LOCKER
   DEPARTMENT
 }
+
+model DeliveryOption {
+  id          String         @id @default(uuid())
+  name        String
+  description String?
+  price       Float
+  method      DeliveryMethod @unique
+  isActive    Boolean        @default(true)
+
+  @@map("delivery_options")
+}

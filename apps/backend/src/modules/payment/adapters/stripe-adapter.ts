@@ -34,6 +34,21 @@ export class StripeAdapter implements IPaymentAdapter {
       };
     });
 
+    if (orderInfo.deliveryPrice && orderInfo.deliveryPrice > 0) {
+      lineItems.push({
+        price_data: {
+          currency: createPaymentDto.currency.toLowerCase(),
+          product_data: {
+            name: 'Delivery',
+            description: 'Shipping cost',
+            images: [],
+          },
+          unit_amount: Math.round(orderInfo.deliveryPrice * 100),
+        },
+        quantity: 1,
+      });
+    }
+
     this.logger.debug(`Creating Stripe checkout session for order ${orderInfo.orderId}`);
 
     const session = await this.stripe.checkout.sessions.create({

@@ -1,4 +1,4 @@
-import { Prisma, Promocode } from '@prisma/client';
+import { Prisma, Promocode, DeliveryMethod } from '@prisma/client';
 
 export type CartWithItems = Prisma.CartGetPayload<{
   include: {
@@ -25,10 +25,12 @@ export interface OrderProcessingContext {
   prisma: Prisma.TransactionClient;
   userId: string;
   promocodeCode?: string;
+  deliveryMethod?: DeliveryMethod;
   now: Date;
   cart?: CartWithItems;
   total?: number;
   promoDiscount?: number;
+  deliveryPrice?: number;
   appliedPromocode?: Promocode;
   pricedItems?: OrderItemCalculation[];
 }
