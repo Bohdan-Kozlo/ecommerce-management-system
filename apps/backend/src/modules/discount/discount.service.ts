@@ -60,17 +60,11 @@ export class DiscountService {
       }
     }
 
-    if (startDate && endDate) {
-      if (new Date(startDate) >= new Date(endDate)) {
-        throw new BadRequestException('Start date must be before end date');
-      }
+    if (startDate && endDate && new Date(startDate) >= new Date(endDate)) {
+      throw new BadRequestException('Start date must be before end date');
     }
 
     const updateData: Partial<Discount> = { ...rest };
-
-    if (startDate) updateData.startDate = new Date(startDate);
-    if (endDate) updateData.endDate = new Date(endDate);
-    if (productId) updateData.productId = productId;
 
     return this.prisma.discount.update({
       where: { id },

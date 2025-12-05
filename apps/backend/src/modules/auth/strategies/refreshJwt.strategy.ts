@@ -6,10 +6,8 @@ import { JwtPayload } from 'src/common/types/types';
 import type { Request as ExpressRequest } from 'express';
 
 export const createCookieExtractor = (cookieName: string) => {
-  return (req?: ExpressRequest): string | null => {
-    if (!req) return null;
-    const cookies = (req as unknown as { cookies?: Record<string, string> }).cookies;
-    if (!cookies) return null;
+  return (req: ExpressRequest): string | null => {
+    const cookies = req.cookies;
     const token = cookies[cookieName];
     return typeof token === 'string' && token.length > 0 ? token : null;
   };
@@ -23,7 +21,7 @@ export class RefreshJwtStrategy extends PassportStrategy(Strategy, 'refresh') {
         createCookieExtractor(configService.getOrThrow('JWT_REFRESH_COOKIE')),
       ]),
       ignoreExpiration: false,
-      secretOrKey: configService.get('JWT_REFRESH_SECRET') as string,
+      secretOrKey: configService.getOrThrow('JWT_REFRESH_SECRET'),
     });
   }
 

@@ -35,46 +35,23 @@ export class DeliveryService implements PaymentObserver, OnModuleInit, OnModuleD
     const { orderId, userId, delivery } = event.payload;
 
     const order = await this.prisma.order.findUnique({
-      where: { id: orderId },
+      where: { id: orderId, userId },
       include: { user: true },
     });
 
     if (!order || !order.user) {
-      this.logger.warn(`Unable to create delivery, order or user missing for order ${orderId}`);
+      this.logger.warn(`Unable to create delivery`);
       return;
     }
-
-    if (order.userId !== userId) {
-      this.logger.warn(
-        `Delivery event user mismatch for order ${orderId}. Expected ${order.userId}, received ${userId}`,
-      );
-      return;
-    }
-
-    const existingDelivery = await this.prisma.delivery.findUnique({ where: { orderId } });
-
-    if (existingDelivery) {
-      this.logger.debug(`Delivery already exists for order ${orderId}, skipping creation`);
-      return;
-    }
-
-    const address = delivery.address?.trim().length
-      ? delivery.address
-      : (order.user.address ?? 'Address not provided');
-    const email = delivery.email;
-    const phone = delivery.phone;
-    const method = delivery.method;
 
     await this.prisma.delivery.create({
       data: {
         orderId,
-        address,
-        email,
-        phone,
-        method,
+        address: delivery.address,
+        email: delivery.email,
+        phone: delivery.phone,
+        method: delivery.method,
       },
     });
-
-    this.logger.log(`Delivery created for order ${orderId} after successful payment`);
   }
 }

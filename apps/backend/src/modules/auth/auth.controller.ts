@@ -83,6 +83,6 @@ export class AuthController {
     this.jwtTokenService.clearRefreshTokenCookie(res);
     this.jwtTokenService.clearAccessTokenCookie(res);
 
-    return { message: 'Logged out successfully' };
+    return;
   }
 }

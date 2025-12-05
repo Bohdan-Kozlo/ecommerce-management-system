@@ -25,11 +25,9 @@ export class DeliveryCalculationHandler extends OrderProcessingHandler {
     }
 
     const deliveryPrice = deliveryOption.price;
-    console.log('Adding delivery price:', deliveryPrice);
 
     context.deliveryPrice = deliveryPrice;
     context.total = (context.total || 0) + deliveryPrice;
-    console.log('Context total after delivery:', context.total);
 
     return context;
   }

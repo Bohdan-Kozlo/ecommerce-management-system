@@ -11,13 +11,6 @@ export class SupabaseStorageService {
 
   async uploadFile(file: Express.Multer.File): Promise<string> {
     try {
-      console.log('Starting file upload to Supabase:', {
-        originalName: file.originalname,
-        size: file.size,
-        mimetype: file.mimetype,
-        bucket: this.bucketName,
-      });
-
       const fileExt = file.originalname.split('.').pop();
       const fileName = `${randomUUID()}.${fileExt}`;
       const filePath = `${fileName}`;

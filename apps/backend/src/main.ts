@@ -17,7 +17,7 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   app.enableCors({
-    origin: configService.get<string>('FRONTEND_URL') || 'http://localhost:3000',
+    origin: configService.getOrThrow('FRONTEND_URL'),
     credentials: true,
   });
 
@@ -32,6 +32,6 @@ async function bootstrap() {
 
   app.useGlobalFilters(new AllExceptionsFilter());
 
-  await app.listen(configService.get('PORT') ?? 3000);
+  await app.listen(configService.getOrThrow('PORT'));
 }
 void bootstrap();

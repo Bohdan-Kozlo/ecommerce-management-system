@@ -32,9 +32,6 @@ export class OrderService {
       const chain = this.orderChainFactory.create();
       const processedContext = await chain.handle(context);
 
-      console.log('Processed context total:', processedContext.total);
-      console.log('Processed context deliveryPrice:', processedContext.deliveryPrice);
-
       if (!processedContext.pricedItems || processedContext.pricedItems.length === 0) {
         throw new InternalServerErrorException('Order items were not prepared correctly');
       }

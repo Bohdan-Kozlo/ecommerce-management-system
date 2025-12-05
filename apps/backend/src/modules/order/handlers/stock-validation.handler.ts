@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { OrderProcessingContext } from './order-processing.types';
 import { OrderProcessingHandler } from './order-processing.handler';
 
@@ -6,7 +6,7 @@ import { OrderProcessingHandler } from './order-processing.handler';
 export class StockValidationHandler extends OrderProcessingHandler {
   protected process(context: OrderProcessingContext): Promise<OrderProcessingContext> {
     if (!context.cart) {
-      throw new InternalServerErrorException('Cart context is missing during stock validation');
+      throw new BadRequestException('Cart is missing for stock validation');
     }
 
     const insufficientItem = context.cart.cartItems.find(

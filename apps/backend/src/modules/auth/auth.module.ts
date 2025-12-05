@@ -18,9 +18,9 @@ import { JwtTokenService } from './jwtToken.service';
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        secret: configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
+        secret: configService.getOrThrow('JWT_ACCESS_SECRET'),
         signOptions: {
-          expiresIn: configService.getOrThrow<string | number>('JWT_ACCESS_EXPIRATION'),
+          expiresIn: configService.getOrThrow('JWT_ACCESS_EXPIRATION'),
         },
       }),
     }),

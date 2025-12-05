@@ -13,7 +13,7 @@ export class AccessJwtStrategy extends PassportStrategy(Strategy, 'access') {
         createCookieExtractor(configService.getOrThrow('JWT_ACCESS_COOKIE')),
       ]),
       ignoreExpiration: false,
-      secretOrKey: configService.get('JWT_ACCESS_SECRET') as string,
+      secretOrKey: configService.getOrThrow('JWT_ACCESS_SECRET'),
     });
   }
 

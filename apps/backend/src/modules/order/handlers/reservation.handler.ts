@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { OrderProcessingContext } from './order-processing.types';
 import { OrderProcessingHandler } from './order-processing.handler';
 
@@ -10,7 +10,7 @@ export class ReservationHandler extends OrderProcessingHandler {
     }
 
     for (const item of context.cart.cartItems) {
-      const { count } = await context.prisma.product.updateMany({
+      await context.prisma.product.updateMany({
         where: {
           id: item.productId,
           stock: {
@@ -23,10 +23,6 @@ export class ReservationHandler extends OrderProcessingHandler {
           },
         },
       });
-
-      if (count === 0) {
-        throw new BadRequestException(`Unable to reserve product ${item.product.name}`);
-      }
     }
 
     return context;

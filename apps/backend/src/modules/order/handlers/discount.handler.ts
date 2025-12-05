@@ -1,14 +1,10 @@
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { OrderProcessingContext, OrderItemCalculation } from './order-processing.types';
 import { OrderProcessingHandler } from './order-processing.handler';
 
 @Injectable()
 export class DiscountHandler extends OrderProcessingHandler {
   protected process(context: OrderProcessingContext): Promise<OrderProcessingContext> {
-    if (!context.cart) {
-      throw new InternalServerErrorException('Cart context is missing during discount calculation');
-    }
-
     const pricedItems = this.calculateDiscountedItems(context);
     const discountedTotal = pricedItems.reduce((sum, item) => sum + item.lineTotal, 0);
 
