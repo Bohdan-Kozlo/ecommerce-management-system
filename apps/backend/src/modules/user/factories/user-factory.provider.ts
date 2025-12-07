@@ -27,8 +27,4 @@ export class UserFactoryProvider {
 
     return factory;
   }
-
-  getAvailableProviders(): AuthProvider[] {
-    return Array.from(this.factories.keys());
-  }
 }

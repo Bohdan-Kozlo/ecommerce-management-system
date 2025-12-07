@@ -11,6 +11,27 @@ export class JwtTokenService {
     private configService: ConfigService,
   ) {}
 
+  async generateTokens(userId: string, role: Role) {
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync(
+        { sub: userId, role },
+        {
+          expiresIn: this.configService.getOrThrow('JWT_ACCESS_EXPIRATION'),
+          secret: this.configService.getOrThrow('JWT_ACCESS_SECRET'),
+        },
+      ),
+      this.jwtService.signAsync(
+        { sub: userId, role },
+        {
+          expiresIn: this.configService.getOrThrow('JWT_REFRESH_EXPIRATION'),
+          secret: this.configService.getOrThrow('JWT_REFRESH_SECRET'),
+        },
+      ),
+    ]);
+
+    return { accessToken, refreshToken };
+  }
+
   setRefreshTokenCookie(res: Response, refreshToken: string) {
     const isProduction = this.configService.get('NODE_ENV') === 'production';
     res.cookie('refreshToken', refreshToken, {
@@ -51,26 +72,5 @@ export class JwtTokenService {
       sameSite: isProduction ? 'strict' : 'lax',
       path: '/',
     });
-  }
-
-  async generateTokens(userId: string, role: Role) {
-    const [accessToken, refreshToken] = await Promise.all([
-      this.jwtService.signAsync(
-        { sub: userId, role },
-        {
-          expiresIn: this.configService.getOrThrow('JWT_ACCESS_EXPIRATION'),
-          secret: this.configService.getOrThrow('JWT_ACCESS_SECRET'),
-        },
-      ),
-      this.jwtService.signAsync(
-        { sub: userId, role },
-        {
-          expiresIn: this.configService.getOrThrow('JWT_REFRESH_EXPIRATION'),
-          secret: this.configService.getOrThrow('JWT_REFRESH_SECRET'),
-        },
-      ),
-    ]);
-
-    return { accessToken, refreshToken };
   }
 }

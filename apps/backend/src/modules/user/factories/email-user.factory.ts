@@ -34,14 +34,12 @@ export class EmailUserFactory implements IUserFactory {
         password: hashedPassword,
       },
     });
-
     return {
       user,
       isNewUser: true,
       provider: AuthProvider.EMAIL,
     };
   }
-
   validateUserData(data: BaseUserData) {
     const emailData = data as EmailUserData;
 
@@ -58,9 +56,5 @@ export class EmailUserFactory implements IUserFactory {
     }
 
     return;
-  }
-
-  getProviderType(): AuthProvider {
-    return AuthProvider.EMAIL;
   }
 }

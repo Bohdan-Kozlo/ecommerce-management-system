@@ -17,7 +17,6 @@ export class AuthController {
     private jwtTokenService: JwtTokenService,
     private configService: ConfigService,
   ) {}
-
   @UseGuards(LocalGuard)
   @Post('login')
   async login(@Request() req: AuthRequest, @Res({ passthrough: true }) res: Response) {
@@ -30,7 +29,6 @@ export class AuthController {
       user: result.user,
     };
   }
-
   @Post('register')
   async register(@Body() body: RegisterDto, @Res({ passthrough: true }) res: Response) {
     const result = await this.authService.register(body);
@@ -42,10 +40,19 @@ export class AuthController {
       user: result.user,
     };
   }
-
   @Get('google')
   @UseGuards(GoogleGuard)
   googleAuth() {}
+  @Auth()
+  @Post('logout')
+  async logout(@Request() req: JwtAuthRequest, @Res({ passthrough: true }) res: Response) {
+    await this.authService.logout(req.user.userId);
+
+    this.jwtTokenService.clearRefreshTokenCookie(res);
+    this.jwtTokenService.clearAccessTokenCookie(res);
+
+    return;
+  }
 
   @Get('google/callback')
   @UseGuards(GoogleGuard)
@@ -73,16 +80,5 @@ export class AuthController {
     return {
       user: result.user,
     };
-  }
-
-  @Auth()
-  @Post('logout')
-  async logout(@Request() req: JwtAuthRequest, @Res({ passthrough: true }) res: Response) {
-    await this.authService.logout(req.user.userId);
-
-    this.jwtTokenService.clearRefreshTokenCookie(res);
-    this.jwtTokenService.clearAccessTokenCookie(res);
-
-    return;
   }
 }

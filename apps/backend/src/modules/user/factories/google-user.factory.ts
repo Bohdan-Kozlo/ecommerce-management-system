@@ -11,14 +11,11 @@ export class GoogleUserFactory implements IUserFactory {
     const result = await this.createUser(data);
     return result;
   }
-
   async createUser(data: BaseUserData) {
     const googleData = data as GoogleUserData;
-
     let user = await this.prisma.user.findUnique({
       where: { googleId: googleData.googleId },
     });
-
     if (user) {
       return {
         user,
@@ -26,7 +23,6 @@ export class GoogleUserFactory implements IUserFactory {
         provider: AuthProvider.GOOGLE,
       };
     }
-
     user = await this.prisma.user.findUnique({
       where: { email: googleData.email },
     });
@@ -43,7 +39,6 @@ export class GoogleUserFactory implements IUserFactory {
         provider: AuthProvider.GOOGLE,
       };
     }
-
     user = await this.prisma.user.create({
       data: {
         googleId: googleData.googleId,
@@ -53,7 +48,6 @@ export class GoogleUserFactory implements IUserFactory {
         password: '',
       },
     });
-
     return {
       user,
       isNewUser: true,
@@ -77,9 +71,5 @@ export class GoogleUserFactory implements IUserFactory {
     }
 
     return;
-  }
-
-  getProviderType(): AuthProvider {
-    return AuthProvider.GOOGLE;
   }
 }

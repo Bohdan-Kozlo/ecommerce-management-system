@@ -31,6 +31,4 @@ export interface IUserFactory {
   createUser(data: BaseUserData): Promise<UserCreationResult>;
 
   validateUserData(data: BaseUserData): void;
-
-  getProviderType(): AuthProvider;
 }
