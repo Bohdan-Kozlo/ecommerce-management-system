@@ -35,14 +35,18 @@ export class PaymentService {
       throw new BadRequestException('Order not found with id ' + createPaymentDto.orderId);
     }
 
+    const deliveryPrice = Math.max(
+      0,
+      order.totalAmount -
+        order.orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
+    );
+
     const orderInfo: OrderInfo = {
       orderId: order.id,
       totalAmount: order.totalAmount,
       orderItems: order.orderItems,
       products: order.orderItems.map((item) => item.product),
-      deliveryPrice:
-        order.totalAmount -
-        order.orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
+      deliveryPrice,
     };
 
     const result = await this.paymentAdapter.createPayment(createPaymentDto, orderInfo);
@@ -59,12 +63,12 @@ export class PaymentService {
     payload: unknown,
     headers: Record<string, string | string[] | undefined>,
   ): Promise<{ received: boolean }> {
-    console.log('Handling payment callback with payload:', payload);
+    this.logger.debug('Handling payment callback');
     const result: PaymentCallbackResult = await this.paymentAdapter.handleCallback(
       payload,
       headers,
     );
-    console.log('Payment callback result:', result);
+    this.logger.debug(`Payment callback result: ${JSON.stringify(result)}`);
     if (!result.success || !result.orderId) {
       this.logger.warn(`Payment callback ignored or unsuccessful. Event: ${result.event}`);
       return { received: true };

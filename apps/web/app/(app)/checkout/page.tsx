@@ -188,7 +188,7 @@ export default function CheckoutPage() {
       product.discount.length > 0 &&
       product.discount[0]
     ) {
-      return product.price * (1 - product.discount[0].value / 100);
+      return Math.max(product.price - product.discount[0].value, 0);
     }
     return product?.price || 0;
   };
@@ -455,7 +455,7 @@ export default function CheckoutPage() {
                           placeholder="Enter code"
                           value={promocode}
                           onChange={(e) =>
-                            setPromocode(e.target.value.toLowerCase())
+                            setPromocode(e.target.value.toUpperCase())
                           }
                           onKeyDown={(e) => {
                             if (e.key === "Enter") {

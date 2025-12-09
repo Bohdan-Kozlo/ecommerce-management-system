@@ -41,7 +41,6 @@ export class PromotionHandler extends OrderProcessingHandler {
     }
 
     context.pricedItems = finalItems;
-    context.promoDiscount = promoDiscount;
     context.total = totalAfterDiscounts;
 
     return context;

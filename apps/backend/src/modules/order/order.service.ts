@@ -16,10 +16,6 @@ export class OrderService {
   ) {}
 
   async createOrderFromCart(userId: string, dto: CreateOrderDto) {
-    if (!dto.delivery || !dto.delivery.method) {
-      throw new InternalServerErrorException('Delivery method is required');
-    }
-
     return this.prisma.$transaction(async (tx) => {
       const context: OrderProcessingContext = {
         prisma: tx,
@@ -32,7 +28,7 @@ export class OrderService {
       const chain = this.orderChainFactory.create();
       const processedContext = await chain.handle(context);
 
-      if (!processedContext.pricedItems || processedContext.pricedItems.length === 0) {
+      if (!processedContext.pricedItems) {
         throw new InternalServerErrorException('Order items were not prepared correctly');
       }
 

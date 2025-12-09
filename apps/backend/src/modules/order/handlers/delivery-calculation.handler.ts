@@ -1,14 +1,9 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
-import { PrismaService } from 'src/common/prisma/prisma.service';
 import { OrderProcessingContext } from './order-processing.types';
 import { OrderProcessingHandler } from './order-processing.handler';
 
 @Injectable()
 export class DeliveryCalculationHandler extends OrderProcessingHandler {
-  constructor(private prisma: PrismaService) {
-    super();
-  }
-
   protected async process(context: OrderProcessingContext): Promise<OrderProcessingContext> {
     if (!context.deliveryMethod) {
       return context;
@@ -26,7 +21,6 @@ export class DeliveryCalculationHandler extends OrderProcessingHandler {
 
     const deliveryPrice = deliveryOption.price;
 
-    context.deliveryPrice = deliveryPrice;
     context.total = (context.total || 0) + deliveryPrice;
 
     return context;

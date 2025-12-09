@@ -166,14 +166,14 @@ export default function CartPage() {
   const displayCart = optimisticCart || cart;
   const cartItems = displayCart?.cartItems || [];
 
-  const calculateItemPrice = (item: ICartItem) => {
+  const calculateItemPrice = (item: (typeof cartItems)[0]) => {
     const product = item.product;
     if (
       product?.discount &&
       product.discount.length > 0 &&
       product.discount[0]
     ) {
-      return product.price * (1 - product.discount[0].value / 100);
+      return Math.max(product.price - product.discount[0].value, 0);
     }
     return product?.price || 0;
   };

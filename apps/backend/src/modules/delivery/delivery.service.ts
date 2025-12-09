@@ -27,7 +27,7 @@ export class DeliveryService implements PaymentObserver, OnModuleInit, OnModuleD
     this.paymentSubject.unregister(this);
   }
 
-  async onPaymentEvent(event: PaymentEvent): Promise<void> {
+  async onPaymentEvent(event: PaymentEvent) {
     if (event.type !== PaymentEventType.PaymentSucceeded) {
       return;
     }

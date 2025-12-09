@@ -103,18 +103,6 @@ export class DiscountService {
     });
   }
 
-  async findPromocodeByCode(code: string) {
-    const promocode = await this.prisma.promocode.findUnique({
-      where: { code },
-    });
-
-    if (!promocode) {
-      throw new NotFoundException(`Promocode ${code} not found`);
-    }
-
-    return promocode;
-  }
-
   async getAllDiscounts() {
     return this.prisma.discount.findMany({
       include: {
