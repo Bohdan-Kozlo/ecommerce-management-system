@@ -15,33 +15,32 @@ export class PromotionHandler extends OrderProcessingHandler {
       throw new InternalServerErrorException('Priced items are missing before applying promocode');
     }
 
-    let totalAfterDiscounts = context.total || 0;
-    let promoDiscount = 0;
-    let finalItems = context.pricedItems;
-
-    if (context.promocodeCode) {
-      const validationResult = await this.discountService.validatePromocode({
-        code: context.promocodeCode,
-        orderAmount: totalAfterDiscounts,
-      });
-
-      if (!validationResult.valid) {
-        throw new InternalServerErrorException(validationResult.message);
-      }
-
-      if (validationResult.promocode && validationResult.discountAmount) {
-        promoDiscount = validationResult.discountAmount;
-        context.appliedPromocode = validationResult.promocode as Promocode;
-      }
+    if (!context.promocodeCode) {
+      return context;
     }
+
+    const currentTotal = context.total || 0;
+
+    const validationResult = await this.discountService.validatePromocode({
+      code: context.promocodeCode,
+      orderAmount: currentTotal,
+    });
+
+    if (!validationResult.valid) {
+      throw new InternalServerErrorException(validationResult.message);
+    }
+
+    if (!validationResult.promocode || !validationResult.discountAmount) {
+      return context;
+    }
+
+    context.appliedPromocode = validationResult.promocode as Promocode;
+    const promoDiscount = validationResult.discountAmount;
 
     if (promoDiscount > 0) {
-      finalItems = this.applyPromoDiscount(context.pricedItems, promoDiscount);
-      totalAfterDiscounts = finalItems.reduce((sum, item) => sum + item.lineTotal, 0);
+      context.pricedItems = this.applyPromoDiscount(context.pricedItems, promoDiscount);
+      context.total = context.pricedItems.reduce((sum, item) => sum + item.lineTotal, 0);
     }
-
-    context.pricedItems = finalItems;
-    context.total = totalAfterDiscounts;
 
     return context;
   }
@@ -76,8 +75,7 @@ export class PromotionHandler extends OrderProcessingHandler {
       remainingDiscount -= itemDiscount;
 
       return {
-        productId: item.productId,
-        quantity: item.quantity,
+        ...item,
         unitPrice: item.quantity > 0 ? newLineTotal / item.quantity : 0,
         lineTotal: newLineTotal,
       };

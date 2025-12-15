@@ -46,6 +46,12 @@ export default function SalesByCategoryPage() {
           from.toISOString(),
           to.toISOString()
         );
+
+        if (!data) {
+          setSalesData([]);
+          return;
+        }
+
         setSalesData(data);
       } catch (error) {
         console.error("Failed to fetch sales data:", error);

@@ -43,6 +43,12 @@ export default function TopProductsPage() {
           to.toISOString(),
           10
         );
+
+        if (!data) {
+          setTopProducts([]);
+          return;
+        }
+
         setTopProducts(data);
       } catch (error) {
         console.error("Failed to fetch top products data:", error);

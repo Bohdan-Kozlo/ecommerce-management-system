@@ -1,11 +1,11 @@
 import { Injectable, BadRequestException, UnauthorizedException } from '@nestjs/common';
-import { PrismaService } from 'src/common/prisma/prisma.service';
 import * as bcrypt from 'bcrypt';
 import { IUserFactory, BaseUserData, EmailUserData, AuthProvider } from './interfaces';
+import { UserService } from '../user.service';
 
 @Injectable()
 export class EmailUserFactory implements IUserFactory {
-  constructor(private prisma: PrismaService) {}
+  constructor(private userService: UserService) {}
 
   async createUserWithValidation(data: BaseUserData) {
     this.validateUserData(data);
@@ -16,9 +16,7 @@ export class EmailUserFactory implements IUserFactory {
   async createUser(data: BaseUserData) {
     const emailData = data as EmailUserData;
 
-    const existingUser = await this.prisma.user.findUnique({
-      where: { email: emailData.email },
-    });
+    const existingUser = await this.userService.findByEmail(emailData.email);
 
     if (existingUser) {
       throw new UnauthorizedException('Email already in use');
@@ -26,13 +24,11 @@ export class EmailUserFactory implements IUserFactory {
 
     const hashedPassword = await bcrypt.hash(emailData.password, 10);
 
-    const user = await this.prisma.user.create({
-      data: {
-        email: emailData.email,
-        firstName: emailData.firstName,
-        lastName: emailData.lastName,
-        password: hashedPassword,
-      },
+    const user = await this.userService.create({
+      email: emailData.email,
+      firstName: emailData.firstName,
+      lastName: emailData.lastName,
+      password: hashedPassword,
     });
     return {
       user,

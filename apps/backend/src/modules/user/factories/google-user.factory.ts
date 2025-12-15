@@ -1,10 +1,10 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { PrismaService } from 'src/common/prisma/prisma.service';
 import { IUserFactory, BaseUserData, GoogleUserData, AuthProvider } from './interfaces';
+import { UserService } from '../user.service';
 
 @Injectable()
 export class GoogleUserFactory implements IUserFactory {
-  constructor(private prisma: PrismaService) {}
+  constructor(private userService: UserService) {}
 
   async createUserWithValidation(data: BaseUserData) {
     this.validateUserData(data);
@@ -13,9 +13,7 @@ export class GoogleUserFactory implements IUserFactory {
   }
   async createUser(data: BaseUserData) {
     const googleData = data as GoogleUserData;
-    let user = await this.prisma.user.findUnique({
-      where: { googleId: googleData.googleId },
-    });
+    let user = await this.userService.findByGoogleId(googleData.googleId);
     if (user) {
       return {
         user,
@@ -23,14 +21,11 @@ export class GoogleUserFactory implements IUserFactory {
         provider: AuthProvider.GOOGLE,
       };
     }
-    user = await this.prisma.user.findUnique({
-      where: { email: googleData.email },
-    });
+    user = await this.userService.findByEmail(googleData.email);
 
     if (user) {
-      user = await this.prisma.user.update({
-        where: { id: user.id },
-        data: { googleId: googleData.googleId },
+      user = await this.userService.update(user.id, {
+        googleId: googleData.googleId,
       });
 
       return {
@@ -39,14 +34,12 @@ export class GoogleUserFactory implements IUserFactory {
         provider: AuthProvider.GOOGLE,
       };
     }
-    user = await this.prisma.user.create({
-      data: {
-        googleId: googleData.googleId,
-        email: googleData.email,
-        firstName: googleData.firstName,
-        lastName: googleData.lastName,
-        password: '',
-      },
+    user = await this.userService.create({
+      googleId: googleData.googleId,
+      email: googleData.email,
+      firstName: googleData.firstName,
+      lastName: googleData.lastName,
+      password: '',
     });
     return {
       user,
