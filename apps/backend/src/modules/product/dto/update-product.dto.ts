@@ -1,5 +1,5 @@
 import { IsString, IsNumber, IsOptional, IsInt, Min, IsArray, IsUrl } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 
 export class UpdateProductDto {
   @IsOptional()
@@ -27,6 +27,10 @@ export class UpdateProductDto {
   categoryId?: string;
 
   @IsOptional()
+  @Transform(({ value }) => {
+    if (value === undefined || value === null) return value;
+    return Array.isArray(value) ? value : [value];
+  })
   @IsArray()
   @IsUrl({}, { each: true })
   images?: string[];

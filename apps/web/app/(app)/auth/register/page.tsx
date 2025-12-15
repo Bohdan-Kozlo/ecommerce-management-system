@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { AuthDivider } from "@/components/auth/auth-divider";
@@ -21,7 +21,7 @@ const initialState: FormState = {
   status: "idle",
 };
 
-export default function Register() {
+function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const from = searchParams.get("from") || "/";
@@ -144,9 +144,17 @@ export default function Register() {
         ) : null}
 
         <Button type="submit" className="w-full" disabled={pending}>
-          {pending ? "Creating..." : "Create account"}
+          {pending ? "Creating account..." : "Create account"}
         </Button>
       </form>
     </AuthShell>
+  );
+}
+
+export default function Register() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <RegisterForm />
+    </Suspense>
   );
 }
